@@ -1,0 +1,45 @@
+// Yellow Submarine Source: https://sketchfab.com/3d-models/yellow-submarine-0dcb53b8f0734509a83a51e672d27dc4#download
+const char* submarineObjPath = "3D/Project/source/submarine.obj";
+const char* submarineTexturePath = "3D/Project/textures/submarine/SubLow0Smooth_DefaultMaterial_BaseColor.png";
+float submarineScale = 0.05;
+
+// Angler Fish Source: https://sketchfab.com/3d-models/angler-fish-creature-pamuya-906c853620194693a85f5e3df3f3dbb1
+const char* anglerFishPath = "3D/Project/source/angler_fish.obj"
+const char* anglerFishTexturePath = "3D/Project/textures/angler_fish/Angler_Texture_V1.jpg"
+float submarineScale = 1.0f;
+
+// Stalker Source: https://sketchfab.com/3d-models/stalker-ed6acdf0fb2e4e769811ffe676ac7fa4
+const char* stalkerObjPath = "3D/Project/source/stalker.obj";
+const char* stalkerTexturePath = "3D/Project/textures/stalker/stalker_low_unwrapped_1001_Diffuse.png";
+float stalkerScale = 0.1f;
+
+// Peeper Source: https://sketchfab.com/3d-models/stalker-ed6acdf0fb2e4e769811ffe676ac7fa4
+const char* peeperObjPath = "3D/Project/source/peeper.obj";
+const char* peeperTexturePath = "3D/Project/textures/peeper/texture.png";
+float peeperScale = 0.05f;
+
+// Reaper Leviathan Source: https://sketchfab.com/3d-models/reaper-leviathan-dfbe936f6fcb40f79bef4d0de6d83a27
+const char* reaperObjPath = "3D/Project/source/leviathan_reaper.obj";
+const char* reaperTexturePath = "3D/Project/textures/leviathan_reaper/reaper_leviathan.png";
+float reaperScale = 1.0f;
+
+// Sea Emperor Source: https://sketchfab.com/3d-models/sea-emperor-9181c2e167974987a453f4812816f7f3
+const char* seaEmperorObjPath = "3D/Project/source/sea_emperor.obj";
+const char* seaEmperorTexturePath = "3D/Project/textures/sea_emperor/sea_emperor_Diffuse.png";
+float seaEmperorScale = 0.005f;
+
+// Hydra Source: https://sketchfab.com/3d-models/leonine-hydra-ed8960cc0e29410588d9663b38375af8
+const char* hydraObjPath = "3D/Project/source/hydra.obj";
+const char* hyrdraTexturePath = "3D/Project/textures/hydra/Color_Hydra2.png";
+float hydraScale = 1.0f; 
+
+// DO NOT USE:
+// Ghost Leviathan Source: https://sketchfab.com/3d-models/ghost-leviathan-65d120c241ff4f20aeec7dadb910f600
+const char* ghostLevObjPath = "3D/Project/source/leviathan_ghost.obj";
+const char* ghostLevTexturePath = "3D/Project/textures/leviathan_ghost/Ghost_Leviathan_shell.png";
+float ghostLevScale = 1.0f;
+    
+// Frozen Leviathan Source: https://sketchfab.com/3d-models/frozen-leviathan-2b62826de17c4394b0d552ddd2141094
+const char* frozenObjPath = "3D/Project/source/leviathan_frozen.obj";
+const char* frozenTexturePath = "3D/Project/textures/leviathan_frozen/frozen_creature_body.png";
+float frozenScale = 0.0025f;
