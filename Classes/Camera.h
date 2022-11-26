@@ -39,7 +39,7 @@ protected:
 
 public:
 	// Bind the attributes of this camera to the specified shader. To be implemented.
-	virtual void bindToShader(Shader shader) = 0;
+	virtual void bindToShader(Shader shader, bool isSkybox = false) = 0;
 
 	// Compute for the projection matrix of this camera.
 	virtual glm::mat4 computeProjectionMatrix() = 0;
@@ -150,10 +150,20 @@ public:
 	}
 
 	// Virtual function implementation. Bind the attributes of this Orthographic Camera to the specified shader.
-	void bindToShader(Shader shader) {
+	void bindToShader(Shader shader, bool isSkybox = false) {
 		shader.setVec3("cameraPos", this->position);
 		shader.setMat4("projection", this->computeProjectionMatrix());
-		shader.setMat4("view", this->computeViewMatrix());
+
+		// If shader is intended for a skybox, modify view matrix
+		if (isSkybox) {
+			glm::mat4 sky_view = glm::mat4(1.0f);
+			sky_view = glm::mat4(glm::mat3(this->computeViewMatrix()));
+			shader.setMat4("view", sky_view);
+		}
+		// Else, just use the usual computation
+		else {
+			shader.setMat4("view", this->computeViewMatrix());
+		}
 	}
 
 	// Virtual function implementation. Compute for the projection matrix of this camera.
@@ -209,10 +219,20 @@ public:
 	}
 
 	// Virtual function implementation. Bind the attributes of this Perspective Camera to the specified shader.
-	void bindToShader(Shader shader) {
+	void bindToShader(Shader shader, bool isSkybox = false) {
 		shader.setVec3("cameraPos", this->position);
 		shader.setMat4("projection", this->computeProjectionMatrix());
-		shader.setMat4("view", this->computeViewMatrix());
+
+		// If shader is intended for a skybox, modify view matrix
+		if (isSkybox) {
+			glm::mat4 sky_view = glm::mat4(1.0f);
+			sky_view = glm::mat4(glm::mat3(this->computeViewMatrix()));
+			shader.setMat4("view", sky_view);
+		}
+		// Else, just use the usual computation
+		else {
+			shader.setMat4("view", this->computeViewMatrix());
+		}
 	}
 
 	// Virtual function implementation. Compute for the projection matrix of this camera.

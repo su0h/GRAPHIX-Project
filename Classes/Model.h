@@ -1,44 +1,6 @@
 #pragma once
 
 /*
-    Texture class implementation. Holds values for texture-related functionality.
- */
-class Texture {
-private:
-    // ID of the texture (generated via glGenTextures())
-    GLuint textureID;
-    // The texture unit this texture is affiliated with (i.e., GL_TEXTURE0)
-    GLuint textureUnit;
-public:
-    // Instantiates a Texture object.
-    Texture(
-        // Unique ID of the texture (generated with glGenTextures())
-        GLuint textureID,
-        // Texture unit used by the texture (i.e., GL_TEXTURE0)
-        GLuint textureUnit
-    ) {
-        this->textureID = textureID;
-        this->textureUnit = textureUnit;
-    }
-
-    // Binds this Texture object to the current shader in use.
-    void bind() {
-        glActiveTexture(textureUnit);
-        glBindTexture(GL_TEXTURE_2D, textureID);
-    }
-
-    // Returns the unique ID of this texture.
-    GLuint getTextureID() {
-        return this->textureID;
-    }
-
-    // Returns the texture unit this texture is affiliated with.
-    GLuint getTextureUnit() {
-        return this->textureUnit;
-    }
-};
-
-/*
     3D Model class implementation. Holds every model-related functionality.
  */
 class Model {
