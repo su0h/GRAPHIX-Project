@@ -150,7 +150,7 @@ public:
     ) {
         // Initialize color
         this->color = color;
-        this->showColor = true; 
+        this->showColor = false; 
 
         // Prepare cubemap
         initCubemap();

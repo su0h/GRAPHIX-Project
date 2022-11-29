@@ -139,7 +139,7 @@ int main(void) {
     submarineNormalMaps.push_back(submarineNormalMapPath);
 
     // Create the plane object
-    Model planeObj = Model(
+    Model submarineObj = Model(
         submarineObjPath,                   // path to .obj
         submarineTextures,                  // list of textures
         submarineNormalMaps,                // list of normal mappings
@@ -155,6 +155,12 @@ int main(void) {
     // for smooth fps movement in all devices
     double prevFrameTime = 0.0f;
     double theta_mod = 0.0f;
+
+    //// Toggle skybox color
+    //defaultSkybox.toggleColor();
+
+    //// Toggle object color
+    //submarineObj.toggleColor();
 
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
@@ -193,10 +199,10 @@ int main(void) {
         theta_mod -= 20.0f * (float)deltaTime;
 
         // Adjust rotation of object
-        planeObj.setRotation(glm::vec3(theta_mod, 0.0f, 0.0f));
+        submarineObj.setRotation(glm::vec3(theta_mod, 0.0f, 0.0f));
 
-        // Draw plane object
-        planeObj.draw(mainShaderProgram);
+        // Draw submarine object
+        submarineObj.draw(mainShaderProgram);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);

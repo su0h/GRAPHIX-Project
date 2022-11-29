@@ -105,7 +105,7 @@ void main() {
 		// If model has textures, apply texture
 		FragColor = vec4(result, 1.0f) * pixelColor;       
 	} else {
-		// If mode has no textures, apply color
+		// If model has no textures OR model color is toggled, apply color
 		FragColor = vec4(result * modelColor, 1.0f);  
 	}
 }
