@@ -5,8 +5,14 @@
 */
 class Skybox {
 private:
+    // Color of the Skybox (in cases texture does not exist)
+    glm::vec3 color;
+    // VAO of the Skybox
     GLuint VAO;
+    // Texture attributes of the Skybox
     Texture texture;
+    // Flag for showing the skybox color or not
+    bool showColor;
 
     // Initializes the cubemap of this skybox
     void initCubemap() {
@@ -138,7 +144,14 @@ private:
     }
 public:
     // Instantiates a Skybox object.
-	Skybox(std::vector<std::string> skyboxFaces) {
+	Skybox(
+        std::vector<std::string> skyboxFaces, 
+        glm::vec3 color = glm::vec3(1.0f)
+    ) {
+        // Initialize color
+        this->color = color;
+        this->showColor = true; 
+
         // Prepare cubemap
         initCubemap();
 
@@ -157,7 +170,13 @@ public:
 
         // Bind the skybox VAO to the shader
         glBindVertexArray(this->VAO);
-        this->texture.bind();
+
+        if (this->showColor) {
+            shader.setBool("showColor", this->showColor);
+            shader.setVec3("skyboxColor", this->color);
+        } 
+        else
+            this->texture.bind();
 
         // Draw skybox
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -165,5 +184,20 @@ public:
         // Reset deppth mask and depth function
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LESS);
+    }
+
+    // Toggle the color of this Skybox.
+    void toggleColor() {
+        this->showColor = !this->showColor;
+    }
+
+    // Sets the color of this skybox.
+    void setColor(glm::vec3 newColor) {
+        this->color = glm::vec3(newColor);
+    }
+
+    // Returns the color of this skybox.
+    glm::vec3 getColor() {
+        return glm::vec3(this->color);
     }
 };

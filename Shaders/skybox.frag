@@ -10,6 +10,16 @@ in vec3 texCoord;
 // Skybox
 uniform samplerCube skybox;
 
+// Show color flag
+uniform bool showColor;
+
+// Color
+uniform vec3 skyboxColor;
+
 void main() {
-    FragColor = texture(skybox, texCoord);
+    if (showColor) {
+        FragColor = vec4(skyboxColor, 1.0);
+    } else {
+        FragColor = texture(skybox, texCoord);
+    }
 }

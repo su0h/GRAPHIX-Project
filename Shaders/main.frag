@@ -43,6 +43,8 @@ uniform sampler2D norm_tex0;
 uniform bool hasNormalMapping;
 // If the current model has texture/s or not
 uniform bool hasTexture;
+// If the current model must use its color instead
+uniform bool showColor;
 
 // TBN matrix for normal mapping
 in mat3 TBN;
@@ -99,7 +101,7 @@ void main() {
 	result += computePointLight(pointLight, normal, fragPos, viewDir);
 
 	// Apply everything to the fragment
-	if (hasTexture) {
+	if (hasTexture && !showColor) {
 		// If model has textures, apply texture
 		FragColor = vec4(result, 1.0f) * pixelColor;       
 	} else {

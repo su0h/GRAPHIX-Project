@@ -24,6 +24,8 @@ private:
     bool hasNormalMapping;
     // Flag to determine if the model has textures
     bool hasTexture;
+    // Flag for showing the model color or not
+    bool showColor;
 
     // List that contains the textures of this model
     std::vector<Texture> textures;
@@ -541,6 +543,7 @@ public:
         this->scale = scale;
         this->color = color;
 
+        this->showColor = false;
         this->hasNormals = true;
         this->hasTexCoords = true;
         this->hasTexture = texturePaths.size() > 0 ? true : false;
@@ -578,8 +581,11 @@ public:
         // Tell the shader if this model uses texture/s or not
         shader.setBool("hasTexture", hasTexture);
 
+        // Tel the shader if this model must use its color
+        shader.setBool("showColor", showColor);
+
         // If the model has texture/s, bind it
-        if (hasTexture) {
+        if (hasTexture && !showColor) {
             // Iterate through all possible texture units
             for (int i = 0; i < textures.size(); i++) {
                 // Bind the 3D model's texture
@@ -644,6 +650,11 @@ public:
         );
 
         return transMatrix;
+    }
+
+    // Toggle the color of the model.
+    void toggleColor() {
+        this->showColor = !this->showColor;
     }
 
     // Return the position of the model.

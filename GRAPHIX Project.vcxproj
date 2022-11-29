@@ -134,15 +134,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
-    <ClCompile Include="GRAPHIXTemplate.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\project.frag" />
-    <None Include="Shaders\project.vert" />
+    <ClInclude Include="Classes\Camera.h" />
+    <ClInclude Include="Classes\Light.h" />
+    <ClInclude Include="Classes\Model.h" />
+    <ClInclude Include="Classes\Player.h" />
+    <ClInclude Include="Classes\Shader.h" />
+    <ClInclude Include="Classes\Skybox.h" />
+    <ClInclude Include="Classes\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="tiny_obj_loader.h" />
+    <Text Include="3D\model_paths.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
