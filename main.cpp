@@ -156,11 +156,11 @@ int main(void) {
     double prevFrameTime = 0.0f;
     double theta_mod = 0.0f;
 
-    //// Toggle skybox color
-    //defaultSkybox.toggleColor();
+    // Toggle skybox color
+    defaultSkybox.toggleColor();
 
-    //// Toggle object color
-    //submarineObj.toggleColor();
+    // Toggle object color
+    submarineObj.toggleColor();
 
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
