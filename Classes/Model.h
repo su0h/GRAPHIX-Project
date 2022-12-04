@@ -36,6 +36,8 @@ private:
     GLuint VAO;
     // The Vertex Buffer Object of this model
     GLuint VBO;
+    // The length of the data of this model
+    int dataLen;
 
     // Limit on the textures to be loaded
     const int TEXT_LIMIT = 2;
@@ -409,14 +411,14 @@ private:
 
         // Initialize data length and pointer offset for buffers
         // To accommodate models without normals, texcoords, and/or normal mapping
-        int vDataLen = VERT_SIZE;
+        this->dataLen = VERT_SIZE;
         int ptrOffset = VERT_SIZE;
         if (hasNormals)
-            vDataLen += NORM_SIZE;
+            this->dataLen += NORM_SIZE;
         if (hasTexCoords)
-            vDataLen += UV_SIZE;
+            this->dataLen += UV_SIZE;
         if (hasNormalMapping)
-            vDataLen += TAN_SIZE + BITAN_SIZE;
+            this->dataLen += TAN_SIZE + BITAN_SIZE;
 
         // Generate VAO
         glGenVertexArrays(1, &this->VAO);
@@ -440,7 +442,7 @@ private:
             VERT_SIZE,
             GL_FLOAT,
             GL_FALSE,
-            vDataLen * sizeof(GL_FLOAT),
+            this->dataLen * sizeof(GL_FLOAT),
             (void*)0
         );
 
@@ -457,7 +459,7 @@ private:
                 NORM_SIZE,
                 GL_FLOAT,
                 GL_FALSE,
-                vDataLen * sizeof(GL_FLOAT),
+                this->dataLen * sizeof(GL_FLOAT),
                 (void*)normPtr
             );
 
@@ -478,7 +480,7 @@ private:
                 UV_SIZE,
                 GL_FLOAT,
                 GL_FALSE,
-                vDataLen * sizeof(GL_FLOAT),
+                this->dataLen * sizeof(GL_FLOAT),
                 (void*)uvPtr
             );
 
@@ -501,7 +503,7 @@ private:
                 TAN_SIZE,
                 GL_FLOAT,
                 GL_FALSE,
-                vDataLen * sizeof(GL_FLOAT),
+                this->dataLen * sizeof(GL_FLOAT),
                 (void*)tangentPtr
             );
 
@@ -510,7 +512,7 @@ private:
                 BITAN_SIZE,
                 GL_FLOAT,
                 GL_FALSE,
-                vDataLen * sizeof(GL_FLOAT),
+                this->dataLen * sizeof(GL_FLOAT),
                 (void*)bitangentPtr
             );
 
@@ -607,7 +609,7 @@ public:
         }
 
         // Draw the model itself
-        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)fullVertexData.size() / 5);
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)fullVertexData.size() / this->dataLen);
         glBindVertexArray(0);
     }
 
