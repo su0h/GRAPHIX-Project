@@ -566,6 +566,65 @@ public:
         this->bindObjData();
     }
 
+    // Instantiates a model object without normal maps.
+    Model(
+        std::string objPath,
+        std::vector<std::string> texturePaths,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 rotation = glm::vec3(0.0f),
+        glm::vec3 scale = glm::vec3(1.0f),
+        glm::vec3 color = glm::vec3(0.0f, 1.0f, 0.0f)
+    ) {
+        // Initialize attributes
+        this->position = position;
+        this->rotation = rotation;
+        this->scale = scale;
+        this->color = color;
+
+        this->showColor = false;
+        this->hasNormals = true;
+        this->hasTexCoords = true;
+        this->hasTexture = texturePaths.size() > 0 ? true : false;
+        this->hasNormalMapping = false;
+
+        // Load the contents of the .obj file provided
+        this->loadObjData(objPath);
+
+        // If the model has textures, then load it
+        if (hasTexture)
+            this->loadTextures(texturePaths);
+
+        // Finally, bind the object's data
+        this->bindObjData();
+    }
+
+    // Instantiates a model object without texture and normal maps.
+    Model(
+        std::string objPath,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 rotation = glm::vec3(0.0f),
+        glm::vec3 scale = glm::vec3(1.0f),
+        glm::vec3 color = glm::vec3(0.0f, 1.0f, 0.0f)
+    ) {
+        // Initialize attributes
+        this->position = position;
+        this->rotation = rotation;
+        this->scale = scale;
+        this->color = color;
+
+        this->showColor = false;
+        this->hasNormals = true;
+        this->hasTexCoords = true;
+        this->hasTexture = false;
+        this->hasNormalMapping = false;
+
+        // Load the contents of the .obj file provided
+        this->loadObjData(objPath);
+
+        // Finally, bind the object's data
+        this->bindObjData();
+    }
+
     // Draw the model using the shader.
     void draw(Shader shader) {
         // Bind the model's VAO
