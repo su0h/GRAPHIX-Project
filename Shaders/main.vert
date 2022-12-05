@@ -1,11 +1,11 @@
 /**
- * Vertex Shader implementation for textured models.
+ * Vertex shader implementation for textured models.
  * 
  * Adapted from: 
  * - https://learnopengl.com/Lighting/Multiple-lights
  * - https://learnopengl.com/Lighting/Light-casters
  */
-#version 330 core // shader version
+#version 330 core // Shader version
 
 // Access attributes in different positions
 layout(location = 0) in vec3 aPos;

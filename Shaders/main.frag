@@ -1,13 +1,13 @@
 /**
- * Fragment Shader implementation for textured models.
+ * Fragment shader implementation for textured models.
  *
  * Adapted from: 
  * - https://learnopengl.com/Lighting/Multiple-lights
  * - https://learnopengl.com/Lighting/Light-casters
  */
-#version 330 core // shader version
+#version 330 core // Shader version
 
-// Struct that contains directional light values
+// Struct that contains directional light attributes
 struct DirectionalLight {
 	vec3 position;
 	
@@ -18,7 +18,7 @@ struct DirectionalLight {
 	float specularPhong;
 };
 
-// Struct that contains point light values
+// Struct that contains point light attributes
 struct PointLight {
     vec3 position;
     
@@ -32,11 +32,11 @@ struct PointLight {
 	float specularPhong;
 };
 
-// texture units for textures
+// Texture units for textures
 uniform sampler2D tex0;
 uniform sampler2D tex1;
 
-// texture unit for normal mapping
+// Texture unit for normal mapping
 uniform sampler2D norm_tex0;
 
 // If the current model has normal mapping or not

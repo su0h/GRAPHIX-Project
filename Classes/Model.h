@@ -406,7 +406,6 @@ private:
 
     // Binds this model's data onto its VAO and VBO.
     void bindObjData() {
-
         // Initialize data length and pointer offset for buffers
         // To accommodate models without normals, texcoords, and/or normal mapping
         int vDataLen = VERT_SIZE;
@@ -616,18 +615,18 @@ public:
         // Initialize the Model Matrix as an identity matrix
         glm::mat4 transMatrix = glm::mat4(1.0f);
 
-        // Apply an X-axis rotation to the Model Matrix
-        transMatrix = glm::rotate(
-            transMatrix,
-            glm::radians(this->rotation.x),
-            glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f))
-        );
-
         // Apply an Y-axis rotation to the Model Matrix
         transMatrix = glm::rotate(
             transMatrix,
             glm::radians(this->rotation.y),
             glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))
+        );
+
+        // Apply an X-axis rotation to the Model Matrix
+        transMatrix = glm::rotate(
+            transMatrix,
+            glm::radians(this->rotation.x),
+            glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f))
         );
 
         // Apply an Z-axis rotation to the Model Matrix
@@ -652,7 +651,7 @@ public:
         return transMatrix;
     }
 
-    // Toggle the color of the model.
+    // Toggles the color of the model.
     void toggleColor() {
         this->showColor = !this->showColor;
     }

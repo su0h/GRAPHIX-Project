@@ -17,7 +17,7 @@ protected:
 	glm::vec3 worldUp;
 	// Where the camera points at
 	glm::vec3 center;
-	// Yaw value of th camera
+	// Yaw value of the camera
 	float yaw;
 	// Pitch value of the camera
 	float pitch;
@@ -86,9 +86,19 @@ public:
 		return this->yaw;
 	}
 
+	// Sets the new yaw value of the camera.
+	void setYaw(float yaw) {
+		this->yaw = yaw;
+	}
+
 	// Returns the pitch value of the camera.
 	float getPitch() {
 		return this->pitch;
+	}
+
+	// Sets the new pitch value of the camera
+	void setPitch(float pitch) {
+		this->pitch = pitch;
 	}
 
 	// Returns the zNear value of the camera.
