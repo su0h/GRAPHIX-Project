@@ -30,7 +30,7 @@ private:
     // List that contains the textures of this model
     std::vector<Texture> textures;
     // List that contains the normals of this model
-    std::vector<Texture> normals;
+    Texture normalMap;
 
     // The Vertex Array Object of this model
     GLuint VAO;
@@ -53,6 +53,8 @@ private:
     const int TAN_SIZE = 3;
     // Size of bitangent components (XYZ)
     const int BITAN_SIZE = 3;
+    // Location of Normal Map
+    const int NORM_MAP_LOC = 9;
 
     // Loads the data inside the .obj file provided. 
     void loadObjData(std::string path) {
@@ -340,69 +342,60 @@ private:
     }
 
     // Loads the normal mappings of this model given a list of file paths.
-    void loadNormals(std::vector<std::string> paths) {
+    void loadNormalMap(std::string path) {
         // Flip images on load
         stbi_set_flip_vertically_on_load(true);
 
-        // Check if there are more than 8 normal mapping paths
-        if (paths.size() > TEXT_LIMIT)
-            std::cout << "WARNING: Only upto " << TEXT_LIMIT << " normal mappings will be loaded." << std::endl;
+        std::cout << "Loading normal mapping from " << path << std::endl;
 
-        // Iterate through each texture path specified
-        for (int i = 0; i < paths.size() && i < TEXT_LIMIT; i++) {
-            const char* path = paths[i].c_str();
+        // Load normal mapping from current path
+        int imgWidth, imgHeight, colorChannels;
+        unsigned char* norm_bytes = stbi_load(
+            path.c_str(),             // texture image filename
+            &imgWidth,        // pointer to image width
+            &imgHeight,       // pointer to image height
+            &colorChannels,   // point to color channels
+            0                 // usually zero
+        );
 
-            std::cout << "Loading normal mapping from " << path << std::endl;
+        // If normal mapping is successfully loaded
+        if (norm_bytes) {
+            std::cout << "Loaded successfully!" << std::endl;
+            std::cout << "Binding normal mapping..." << std::endl;
 
-            // Load normal mapping from current path
-            int imgWidth, imgHeight, colorChannels;
-            unsigned char* norm_bytes = stbi_load(
-                path,             // texture image filename
-                &imgWidth,        // pointer to image width
-                &imgHeight,       // pointer to image height
-                &colorChannels,   // point to color channels
-                0                 // usually zero
+            // Prepare normal mapping
+            GLuint textureID;
+            // normal mapping starts at GL_TEXTURE9 upwards (to avoid conflict with texture)
+            GLuint textureUnit = GL_TEXTURE9;
+            glGenTextures(1, &textureID);
+            glActiveTexture(textureUnit);
+            glBindTexture(GL_TEXTURE_2D, textureID);
+
+            // Set the parameters to be the same as the diffuse color
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RGB,
+                imgWidth,
+                imgHeight,
+                0,
+                GL_RGB,
+                GL_UNSIGNED_BYTE,
+                norm_bytes
             );
 
-            // If normal mapping is successfully loaded
-            if (norm_bytes) {
-                std::cout << "Loaded successfully!" << std::endl;
-                std::cout << "Binding normal mapping..." << std::endl;
+            // Instantiate normal mapping as Texture
+            this->normalMap = Texture(textureID, textureUnit);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            stbi_image_free(norm_bytes);
 
-                // Prepare normal mapping
-                GLuint textureID;
-                // normal mapping starts at GL_TEXTURE9 upwards (to avoid conflict with texture)
-                GLuint textureUnit = GL_TEXTURE0 + TEXT_OFFSET;
-                glGenTextures(1, &textureID);
-                glActiveTexture(textureUnit);
-                glBindTexture(GL_TEXTURE_2D, textureID);
-
-                // Set the parameters to be the same as the diffuse color
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-                glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RGB,
-                    imgWidth,
-                    imgHeight,
-                    0,
-                    GL_RGB,
-                    GL_UNSIGNED_BYTE,
-                    norm_bytes
-                );
-
-                // Append the normal mapping onto the model's list
-                normals.push_back(Texture(textureID, textureUnit));
-                glGenerateMipmap(GL_TEXTURE_2D);
-                stbi_image_free(norm_bytes);
-
-                std::cout << "Normal mapping bound successfully!" << std::endl;
-            }
-            else {
-                std::cout << "ERROR: Unable to load normal mapping!" << std::endl;
-            }
+            std::cout << "Normal mapping bound successfully!" << std::endl;
+        }
+        else {
+            std::cout << "ERROR: Unable to load normal mapping!" << std::endl;
         }
     }
 
@@ -529,11 +522,11 @@ private:
     }
 
 public:
-    // Instantiates a model object.
+    // Instantiates a model object with texture and normal mapping.
     Model(
         std::string objPath,
         std::vector<std::string> texturePaths,
-        std::vector<std::string> normalMapPaths,
+        std::string normalMapPath,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec3 rotation = glm::vec3(0.0f),
         glm::vec3 scale = glm::vec3(1.0f),
@@ -549,7 +542,7 @@ public:
         this->hasNormals = true;
         this->hasTexCoords = true;
         this->hasTexture = texturePaths.size() > 0 ? true : false;
-        this->hasNormalMapping = normalMapPaths.size() > 0 ? true : false;
+        this->hasNormalMapping = normalMapPath.size() > 0 ? true : false;
 
         // Load the contents of the .obj file provided
         this->loadObjData(objPath);
@@ -560,13 +553,13 @@ public:
 
         // If the model has normal mapping, then load it
         if (hasNormalMapping)
-            this->loadNormals(normalMapPaths);
+            this->loadNormalMap(normalMapPath);
 
         // Finally, bind the object's data
         this->bindObjData();
     }
 
-    // Instantiates a model object without normal maps.
+    // Instantiates a model object with textures only.
     Model(
         std::string objPath,
         std::vector<std::string> texturePaths,
@@ -593,33 +586,6 @@ public:
         // If the model has textures, then load it
         if (hasTexture)
             this->loadTextures(texturePaths);
-
-        // Finally, bind the object's data
-        this->bindObjData();
-    }
-
-    // Instantiates a model object without texture and normal maps.
-    Model(
-        std::string objPath,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec3 rotation = glm::vec3(0.0f),
-        glm::vec3 scale = glm::vec3(1.0f),
-        glm::vec3 color = glm::vec3(0.0f, 1.0f, 0.0f)
-    ) {
-        // Initialize attributes
-        this->position = position;
-        this->rotation = rotation;
-        this->scale = scale;
-        this->color = color;
-
-        this->showColor = false;
-        this->hasNormals = true;
-        this->hasTexCoords = true;
-        this->hasTexture = false;
-        this->hasNormalMapping = false;
-
-        // Load the contents of the .obj file provided
-        this->loadObjData(objPath);
 
         // Finally, bind the object's data
         this->bindObjData();
@@ -637,28 +603,28 @@ public:
         shader.setMat4("model", transMatrix);
 
         // Tell the shader if this model uses normal mapping or not
-        shader.setBool("hasNormalMapping", hasNormalMapping);
+        shader.setBool("hasNormalMapping", this->hasNormalMapping);
 
         // Tell the shader if this model uses texture/s or not
-        shader.setBool("hasTexture", hasTexture);
+        shader.setBool("hasTexture", this->hasTexture);
 
         // Tel the shader if this model must use its color
         shader.setBool("showColor", this->showColor);
 
+        // If the model has normal mapping, bind it
+        if (this->hasNormalMapping) {
+            // Bind the 3D model's normal mapping
+            normalMap.bind();
+            shader.setInt("norm_tex0", NORM_MAP_LOC);
+        }
+
         // If the model has texture/s, bind it
-        if (hasTexture && !showColor) {
+        if (this->hasTexture && !this->showColor) {
             // Iterate through all possible texture units
             for (int i = 0; i < textures.size(); i++) {
                 // Bind the 3D model's texture
                 this->textures[i].bind();
                 shader.setInt("tex" + std::to_string(i), i);
-            }
-
-            // Iterate through all possible normal mapping texture units
-            for (int i = 0; i < this->normals.size(); i++) {
-                // Bind the 3D model's normal mapping
-                this->normals[i].bind();
-                shader.setInt("norm_tex" + std::to_string(i), i + TEXT_OFFSET);
             }
         }
         // Else, use the model's color
