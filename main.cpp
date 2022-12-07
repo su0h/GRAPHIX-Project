@@ -22,7 +22,7 @@
 #include "Classes/Light.h"   // Light Class
 #include "Classes/Texture.h" // Texture Class
 #include "Classes/Model.h"   // 3D Model Class
-#include "Classes/Skybox.h"  // Skybox
+#include "Classes/Skybox.h"  // Skybox Class
 #include "Classes/Player.h"  // Player Class
 
 /******** 3D MODELS ********/
@@ -125,8 +125,8 @@ int main(void) {
         return -1;
 
     // Window dimensions
-    const int screenWidth = 750;
-    const int screenHeight = 750;
+    const int screenWidth = 1000;
+    const int screenHeight = 1000;
 
     // Create a windowed mode window and its OpenGL context
     GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "No Man's Submarine", NULL, NULL);
@@ -169,7 +169,7 @@ int main(void) {
         -50.0f,                        // bottom coordinate
         50.0f,                         // top coordinate
         0.1f,                          // zNear
-        200.0f                         // zFar
+        1000.0f                        // zFar
     );
     // Top / bird's eye (orthographic) view variables
     float topViewSpeed = 0.5f; // top view camera movement speed
@@ -205,7 +205,7 @@ int main(void) {
         glm::radians(60.0f),                        // field of view
         (float)screenHeight / (float)screenWidth,   // aspect ratio
         0.1f,                                       // zNear
-        100.0f                                      // zFar; can see farther unlike the third pov camera
+        800.0f                                      // zFar; can see farther unlike the third pov camera
     );
     firstPOVCamera.setCenter(0.0f, 90.0f);          // initially rotate 1st POV camera 90 degrees to the right
     // 3rd POV Camera
@@ -217,7 +217,7 @@ int main(void) {
         glm::radians(60.0f),                        
         (float)screenHeight / (float)screenWidth,   
         0.1f,                                       
-        100.0f        // zFar; third pov camera cannot see as far unlike the first pov camera
+        400.0f        // zFar; third pov camera cannot see as far unlike the first pov camera
     );
     // Player
     Player player = Player(
@@ -276,17 +276,17 @@ int main(void) {
             // Check if 1st or 3rd POV camera
             if (player.isFirstPOVCameraUsed()) {
                 // Render skybox with shade of green for first POV
-                whirlpoolSkybox.disableTextureColor();
+                whirlpoolSkybox.toggleColor(true);
                 player.getFirstPOVCamera()->bindToShaderFirstPOV(skyboxShaderProgram, true);
             }
             else {
                 // Render skybox with default texture color
-                whirlpoolSkybox.enableTextureColor();
+                whirlpoolSkybox.toggleColor(false);
                 player.getThirdPOVCamera()->bindToShader(skyboxShaderProgram, true);
             }
         }
         else {
-            whirlpoolSkybox.enableTextureColor();
+            whirlpoolSkybox.toggleColor(false);
             topViewCamera.bindToShader(skyboxShaderProgram, true);
         }
 
@@ -362,17 +362,17 @@ int main(void) {
                 // Check first if top view camera was currently used
                 if (!player.isPOVCameraUsed()) {
                     // Change back to using player POV camera
-                    player.enableCamera();
+                    player.toggleCamera(true);
                 }
                 else {
                     // If 1st POV camera is going to be used
                     if (!player.isFirstPOVCameraUsed()) {
                         // Use 1st POV camera of player
-                        player.useFirstPOVCamera();
+                        player.toggleFirstPOVCamera(true);
                     }
                     else {
                         // Use 3rd POV camera of a player
-                        player.useThirdPOVCamera();
+                        player.toggleFirstPOVCamera(false);
                     }
                 }
 
@@ -390,7 +390,7 @@ int main(void) {
             topViewCamera.setCenter(player.getModel()->getPosition());
 
             // Swap between player POV camera and top view camera
-            player.disableCamera();
+            player.toggleCamera(false);
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
             // If currently used camera view is top view

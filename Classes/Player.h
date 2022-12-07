@@ -286,14 +286,9 @@ public:
 		);
 	}
 
-	// Enables the player's POV camera; if it is to be used or not.
-	void enableCamera() {
-		this->showPlayerPOVCamera = true;
-	}
-
-	// Disables the player's POV camera; top view camera is going to be used.
-	void disableCamera() {
-		this->showPlayerPOVCamera = false;
+	// Toggles the player's POV camera; if it is to be used or not.
+	void toggleCamera(bool use) {
+		this->showPlayerPOVCamera = use;
 	}
 
 	// Returns the boolean value indicating if player's POV camera is currently being used or not.
@@ -301,14 +296,9 @@ public:
 		return this->showPlayerPOVCamera;
 	}
 
-	// Uses the player's first POV camera.
-	void useFirstPOVCamera() {
-		this->showFirstPOVCamera = true;
-	}
-
-	// Uses the player's third POV camera.
-	void useThirdPOVCamera() {
-		this->showFirstPOVCamera = false;
+	// Toggles the player's first POV camera; if using first POV or not.
+	void toggleFirstPOVCamera(bool use) {
+		this->showFirstPOVCamera = use;
 	}
 
 	// Returns the boolean value indicating if the current POV camera of player being used is first POV camera.
