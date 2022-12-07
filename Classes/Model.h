@@ -678,9 +678,14 @@ public:
         return transMatrix;
     }
 
-    // Toggles the color of the model.
-    void toggleColor() {
-        this->showColor = !this->showColor;
+    // Enables texture color; uses the default color of the texture for rendering this model.
+    void enableTextureColor() {
+        this->showColor = false;
+    }
+
+    // Disables texture color; uses the green color for rendering this model (for first POV / sonar-like view).
+    void disableTextureColor() {
+        this->showColor = true;
     }
 
     // Return the position of the model.

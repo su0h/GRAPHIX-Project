@@ -189,9 +189,14 @@ public:
         glDepthFunc(GL_LESS);
     }
 
-    // Toggle the color of this Skybox.
-    void toggleColor() {
-        this->showColor = !this->showColor;
+    // Enables texture color; uses the default color of the faces for rendering this skybox.
+    void enableTextureColor() {
+        this->showColor = false;
+    }
+
+    // Disables texture color; uses the green color for rendering this skybox (for first POV / sonar-like view).
+    void disableTextureColor() {
+        this->showColor = true;
     }
 
     // Sets the color of this skybox.

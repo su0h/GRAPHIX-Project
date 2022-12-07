@@ -33,7 +33,7 @@ std::string submarineNormalMapPath = "3D/Project/textures/submarine/sublow0smoot
 
 // Submarine initial configurations (position, rotation, scale)
 glm::vec3 submarinePos = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 submarineRot = glm::vec3(0.0f, 90.0f, 0.0f);
+glm::vec3 submarineRot = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 submarineScale = glm::vec3(0.05f);
 
 // Vector of 3D enemy models and textures paths
@@ -161,7 +161,7 @@ int main(void) {
     /******** PREPARE TOP VIEW / BIRD'S EYE CAMERA (ORTHOGRAPHIC) ********/
     // Top view / bird's eye view camera
     OrthoCamera topViewCamera = OrthoCamera(
-        glm::vec3(0.0f, 90.0f, 10.0f),  // camera eye
+        glm::vec3(0.0f, 90.0f, 10.0f), // camera eye
         glm::vec3(0.0f, 0.0f, 1.0f),   // camera center
         glm::vec3(0.0f, 1.0f, 0.0f),   // camera up
         -50.0f,                        // left coordinate
@@ -201,12 +201,13 @@ int main(void) {
     PerspectiveCamera firstPOVCamera = PerspectiveCamera(
         firstPOVCameraPos,                          // camera position
         glm::vec3(0.0f, 1.0f, 0.0f),                // worldup
-        glm::vec3(0.0f, 0.0f, 1.0f),                // camera center
+        glm::vec3(0.0f, 0.0f, 0.0f),                // camera center
         glm::radians(60.0f),                        // field of view
         (float)screenHeight / (float)screenWidth,   // aspect ratio
         0.1f,                                       // zNear
         100.0f                                      // zFar; can see farther unlike the third pov camera
     );
+    firstPOVCamera.setCenter(0.0f, 90.0f);          // initially rotate 1st POV camera 90 degrees to the right
     // 3rd POV Camera
     glm::vec3 thirdPOVCameraPos = submarinePos;
     PerspectiveCamera thirdPOVCamera = PerspectiveCamera(
@@ -251,6 +252,12 @@ int main(void) {
     float prevY = (float)screenHeight / 2.0f; // Previous mouse Y offset
     const float sensitivity = 0.1f;           // 3rd pov camera sensitivity when receiving mouse input
 
+    // Previous swap time between player's 1st and 3rd POV cameras; for cooldown
+    float prevCamSwapTime = 0.0f;
+
+    // Previous swap time of light's intensity
+    float prevIntSwapTime = 0.0f;
+
     // Enable OpenGL's depth testing to avoid models "overlapping"
     // when using different colors or textures for each model
     glEnable(GL_DEPTH_TEST);
@@ -268,13 +275,18 @@ int main(void) {
         if (player.isPOVCameraUsed()) {
             // Check if 1st or 3rd POV camera
             if (player.isFirstPOVCameraUsed()) {
+                // Render skybox with shade of green for first POV
+                whirlpoolSkybox.disableTextureColor();
                 player.getFirstPOVCamera()->bindToShaderFirstPOV(skyboxShaderProgram, true);
             }
             else {
+                // Render skybox with default texture color
+                whirlpoolSkybox.enableTextureColor();
                 player.getThirdPOVCamera()->bindToShader(skyboxShaderProgram, true);
             }
         }
         else {
+            whirlpoolSkybox.enableTextureColor();
             topViewCamera.bindToShader(skyboxShaderProgram, true);
         }
 
@@ -342,17 +354,41 @@ int main(void) {
 
         /******** KEYBOARD INPUTS ********/
         if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-            // Check first if top view camera was currently used
-            if (!player.isPOVCameraUsed()) {
-                // Change back to using player POV camera
-                player.enableCamera();
-            }
-            else {
-                // Swap between 1st and 3rd POV cameras
-                player.changeCamera();
+            // Get current time 
+            double currTime = glfwGetTime();
+
+            // If 0.2 seconds have passed, switch camera POVs
+            if (currTime - prevCamSwapTime > 0.2f) {
+                // Check first if top view camera was currently used
+                if (!player.isPOVCameraUsed()) {
+                    // Change back to using player POV camera
+                    player.enableCamera();
+                }
+                else {
+                    // If 1st POV camera is going to be used
+                    if (!player.isFirstPOVCameraUsed()) {
+                        // Use 1st POV camera of player
+                        player.useFirstPOVCamera();
+                    }
+                    else {
+                        // Use 3rd POV camera of a player
+                        player.useThirdPOVCamera();
+                    }
+                }
+
+                // Make current time as previous time for succeeding inputs
+                prevCamSwapTime = currTime;
             }
         }
         if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+            // Update position and direction of top view camera based on new position of player's model
+            // Ensures that its on the top center of the player's model when switched back
+            glm::vec3 topViewCameraPos = topViewCamera.getPosition();
+            topViewCameraPos.x = player.getModel()->getPosition().x;
+            topViewCameraPos.z = player.getModel()->getPosition().z;
+            topViewCamera.setPosition(topViewCameraPos);
+            topViewCamera.setCenter(player.getModel()->getPosition());
+
             // Swap between player POV camera and top view camera
             player.disableCamera();
         }
@@ -420,14 +456,27 @@ int main(void) {
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
             // If player POV camera is currently used
             if (player.isPOVCameraUsed()) {
-                // Ascend player
-                player.ascend();
+                // Descend player
+                player.descend();
             }
         }
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
             if (player.isPOVCameraUsed()) {
-                // Descend player
-                player.descend();
+                // Ascend player
+                player.ascend();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+            // Get current time
+            double currTime = glfwGetTime();
+
+            // If 0.2 seconds has already passed
+            if (currTime - prevIntSwapTime > 0.2f) {
+                // Change light intensity between low, medium, and high
+                player.changeLightIntensity();
+
+                // Assign current time as previous time for succeeding inputs
+                prevIntSwapTime = currTime;
             }
         }
     }

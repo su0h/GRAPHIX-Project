@@ -31,7 +31,7 @@ private:
 	// Default color of point light; change as necessary
 	const glm::vec3 defaultPointLightColor = glm::vec3(1.0f);
 	// Point light intensity values (low, medium, and high)
-	const float lightIntensityVals[3]{0.5, 1.0, 2.0};
+	const float lightIntensityVals[3]{0.5, 1.0, 3.0};
 	// Point light intensity value index
 	int lightIntensityValIndex;
 
@@ -48,11 +48,6 @@ private:
 		// Update position of third POV camera based on new position and rotation of player's model
 		// Should be n distance units away from the player's model
 		glm::vec3 cameraPos = this->thirdPOVCamera->getPosition();
-		/*cameraPos.x = modelPos.x + -sin(glm::radians(modelRot.x)) * thirdPOVCameraDist; 
-		cameraPos.y = modelPos.y + 0.75f;
-		cameraPos.z = modelPos.z + -cos(glm::radians(modelRot.z)) * thirdPOVCameraDist;*/
-
-		// TEMPORARY
 		cameraPos.x = modelPos.x + sin(glm::radians(yaw)) * cos(glm::radians(pitch)) * this->thirdPOVCameraDist;
 		cameraPos.y = modelPos.y + sin(glm::radians(pitch)) * this->thirdPOVCameraDist;
 		cameraPos.z = modelPos.z + cos(glm::radians(yaw)) * cos(glm::radians(pitch)) * -this->thirdPOVCameraDist;
@@ -81,7 +76,7 @@ public:
 		PerspectiveCamera* thirdPOVCamera, 
 		PointLight* pointLight,
 		bool showPlayerPOVCamera = false, // Start of the program should use player pov camera first
-		bool showFirstPOVCamera = true,  // Player's third POV camera is used first as well
+		bool showFirstPOVCamera = false,  // Player's third POV camera is used first as well
 		int lightIntensityValIndex = 1    // Start at medium light intensity
 	) {
 		// Initialize attributes
@@ -92,6 +87,11 @@ public:
 		this->showPlayerPOVCamera = showPlayerPOVCamera;
 		this->showFirstPOVCamera = showFirstPOVCamera;
 		this->lightIntensityValIndex = lightIntensityValIndex;
+
+		// Set intensity of light to initial light intensity value
+		this->pointLight->setLightColor(
+			this->defaultPointLightColor * this->lightIntensityVals[this->lightIntensityValIndex]
+		);
 	}
 
 	// Draws the player's elements using the shader.
@@ -111,8 +111,10 @@ public:
 		// Bind the point light to the shader
 		this->pointLight->bindToShader(shader);
 		
-		// Draw the player's model
-		this->model->draw(shader);
+		// Draw the player's model if current camera view is not first POV or is top view
+		if (!this->showFirstPOVCamera || !this->showPlayerPOVCamera) {
+			this->model->draw(shader);
+		}
 	}
 
 	// Moves the player forward.
@@ -270,13 +272,12 @@ public:
 
 	// Changes (cycles through) the intensity of the model's point light.
 	void changeLightIntensity() {
+		// Increment light intensity value index
+		this->lightIntensityValIndex++;
+
 		// If previous light intensity value was high, move back to low light intensity value
-		if (this->lightIntensityValIndex == 2) {
+		if (this->lightIntensityValIndex == 3) {
 			this->lightIntensityValIndex = 0;
-		}
-		else {
-			// Increment light intensity value index
-			this->lightIntensityValIndex++;
 		}
 
 		// Change light intensity
@@ -300,9 +301,14 @@ public:
 		return this->showPlayerPOVCamera;
 	}
 
-	// Changes the player's POV camera to be used; if first or third POV.
-	void changeCamera() {
-		this->showFirstPOVCamera = !this->showFirstPOVCamera;
+	// Uses the player's first POV camera.
+	void useFirstPOVCamera() {
+		this->showFirstPOVCamera = true;
+	}
+
+	// Uses the player's third POV camera.
+	void useThirdPOVCamera() {
+		this->showFirstPOVCamera = false;
 	}
 
 	// Returns the boolean value indicating if the current POV camera of player being used is first POV camera.
