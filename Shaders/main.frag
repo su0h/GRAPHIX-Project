@@ -97,7 +97,7 @@ void main() {
 	vec3 viewDir = normalize(cameraPos - fragPos);
     
 	// Compute for all the lights needed
-	vec3 result;
+	vec3 result = computeDirectLight(directionalLight, normal, viewDir);
 	result += computePointLight(pointLight, normal, fragPos, viewDir);
 
 	// Apply everything to the fragment

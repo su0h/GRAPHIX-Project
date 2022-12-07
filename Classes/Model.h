@@ -629,8 +629,8 @@ public:
         // Bind the model's VAO
         glBindVertexArray(this->VAO);
 
-        // Compute for the transformation matrix
-        glm::mat4 transMatrix = this->computeTransMatrix();
+        // Compute for the transformation matrix; check if around world origin or not
+        glm::mat4 transMatrix = computeTransMatrix();
 
         // Link the Model Matrix to the shader program
         shader.setMat4("model", transMatrix);
@@ -676,6 +676,12 @@ public:
         // Initialize the Model Matrix as an identity matrix
         glm::mat4 transMatrix = glm::mat4(1.0f);
 
+        // Apply a translation to the Model Matrix
+        transMatrix = glm::translate(
+            transMatrix,
+            this->position
+        );
+
         // Apply an Y-axis rotation to the Model Matrix
         transMatrix = glm::rotate(
             transMatrix,
@@ -695,12 +701,6 @@ public:
             transMatrix,
             glm::radians(this->rotation.z),
             glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f))
-        );
-
-        // Apply a translation to the Model Matrix
-        transMatrix = glm::translate(
-            transMatrix,
-            this->position
         );
 
         // Apply scaling to the Model Matrix

@@ -16,16 +16,19 @@ private:
 
     // Initializes the cubemap of this skybox
     void initCubemap() {
+        // Size of cube (for vertices)
+        float size = 100.0f;
+
         // Vertices for the cube
         float vertices[]{
-            -1.f, -1.f, 1.f, // 0
-            1.f, -1.f, 1.f,  // 1
-            1.f, -1.f, -1.f, // 2
-            -1.f, -1.f, -1.f,// 3
-            -1.f, 1.f, 1.f,  // 4
-            1.f, 1.f, 1.f,   // 5
-            1.f, 1.f, -1.f,  // 6
-            -1.f, 1.f, -1.f  // 7
+            -size, -size, size, // 0
+            size, -size, size,  // 1
+            size, -size, -size, // 2
+            -size, -size, -size,// 3
+            -size, size, size,  // 4
+            size, size, size,   // 5
+            size, size, -size,  // 6
+            -size, size, -size  // 7
         };
 
         // Skybox Indices

@@ -32,8 +32,8 @@ std::string submarineTexturePath = "3D/Project/textures/submarine/sublow0smooth_
 std::string submarineNormalMapPath = "3D/Project/textures/submarine/sublow0smooth_defaultmaterial_normal.png";
 
 // Submarine initial configurations (position, rotation, scale)
-glm::vec3 submarinePos = glm::vec3(0.0f, -10.0f, 0.0f);
-glm::vec3 submarineRot = glm::vec3(0.0f);
+glm::vec3 submarinePos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 submarineRot = glm::vec3(0.0f, 90.0f, 0.0f);
 glm::vec3 submarineScale = glm::vec3(0.05f);
 
 // Vector of 3D enemy models and textures paths
@@ -66,34 +66,34 @@ std::vector<std::vector<std::string>> enemies{
 // Vector of 3D enemy model configurations (position, rotation, and scale)
 std::vector<std::vector<glm::vec3>> enemyConfigs{
     // Angler fish
-    {glm::vec3(0.0f, -98.0f, 8.0f),  // position
-     glm::vec3(0.0f),                // rotation
+    {glm::vec3(20.0f, -50.0f, 0.0f), // position
+     glm::vec3(0.0f, 180.0f, 0.0f),  // rotation
      glm::vec3(1.0f)},               // scale
 
     // Stalker
-    {glm::vec3(3.0f, -208.0f, -12.0f),
-     glm::vec3(0.0f),
+    {glm::vec3(70.0f, -68.0f, -50.0f),
+     glm::vec3(0.0f, -45.0f, 0.0f),
      glm::vec3(0.1f)},
 
     // Peeper
-    {glm::vec3(8.0f, -150.0f, 10.0f),
+    {glm::vec3(80.0f, -90.0f, 30.0f),
      glm::vec3(0.0f),
      glm::vec3(0.05f)},
 
     // Reaper Leviathan
-    {glm::vec3(-6.0f, -45.0f, 6.0f),
-     glm::vec3(0.0f),
+    {glm::vec3(-55.0f, -45.0f, 45.0f),
+     glm::vec3(0.0f, 100.0f, 0.0f),
      glm::vec3(1.0f)},
 
     // Sea Emperor
-    {glm::vec3(-3.0f, -179.0f, -15.0f),
-     glm::vec3(0.0f),
+    {glm::vec3(-70.0f, -78.0f, -45.0f),
+     glm::vec3(0.0f, 30.0f, 0.0f),
      glm::vec3(0.005f)},
 
     // Hydra
-    {glm::vec3(10.0f, -65.0f, -15.0f),
-     glm::vec3(0.0f),
-     glm::vec3(1.0f)},
+    {glm::vec3(0.0f, -20.0f, 55.0f),
+     glm::vec3(0.0f, 180.0f, 0.0f),
+     glm::vec3(1.0f)}
 };
 
 /******** SKYBOX ********/
@@ -116,17 +116,6 @@ const char* fragPath = "Shaders/main.frag";
 const char* skyboxVertPath = "Shaders/skybox.vert";
 const char* skyboxFragPath = "Shaders/skybox.frag";
 
-/******** SYSTEM VARIABLES ********/
-// Window dimensions
-const int screenWidth = 750;
-const int screenHeight = 750;
-
-// Mouse inputs
-bool firstMouseBtn = true;                // Avoids sudden camera movement on first mouse input
-float prevX = (float)screenWidth / 2.0f;  // Previous mouse X offset
-float prevY = (float)screenHeight / 2.0f; // Previous mouse Y offset
-const float sensitivity = 0.1f;           // Camera sensitivity when receiving mouse input
-
 /*
     Main (driver) function.
  */
@@ -134,6 +123,10 @@ int main(void) {
     // Initialize the GLFW library
     if (!glfwInit())
         return -1;
+
+    // Window dimensions
+    const int screenWidth = 750;
+    const int screenHeight = 750;
 
     // Create a windowed mode window and its OpenGL context
     GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "No Man's Submarine", NULL, NULL);
@@ -160,23 +153,26 @@ int main(void) {
         glm::vec3(0.0f, 1.0f, 0.0f), // light position
         glm::vec3(1.0f),             // light color
         glm::vec3(1.0f),             // ambient light color
-        0.5f,                        // ambient light strength
+        0.05f,                        // ambient light strength
         1.0f,                        // specular strength
         16.0f                        // specular phong
     );
 
-    /******** PREPARE TOP VIEW CAMERA (ORTHOGRAPHIC) ********/
+    /******** PREPARE TOP VIEW / BIRD'S EYE CAMERA (ORTHOGRAPHIC) ********/
+    // Top view / bird's eye view camera
     OrthoCamera topViewCamera = OrthoCamera(
-        glm::vec3(0.0f, 90.0f, 10.0f), // camera eye
+        glm::vec3(0.0f, 90.0f, 10.0f),  // camera eye
         glm::vec3(0.0f, 0.0f, 1.0f),   // camera center
         glm::vec3(0.0f, 1.0f, 0.0f),   // camera up
-        -1.0f,                         // left coordinate
-        1.0f,                          // right coordinate
-        -1.0f,                         // bottom coordinate
-        1.0f,                          // top coordinate
+        -50.0f,                        // left coordinate
+        50.0f,                         // right coordinate
+        -50.0f,                        // bottom coordinate
+        50.0f,                         // top coordinate
         0.1f,                          // zNear
-        100.0f                         // zFar
+        200.0f                         // zFar
     );
+    // Top / bird's eye (orthographic) view variables
+    float topViewSpeed = 0.5f; // top view camera movement speed
 
     /******** PREPARE PLAYER ********/
     // Model
@@ -192,7 +188,7 @@ int main(void) {
     );
     // Point light
     glm::vec3 lightPos = submarinePos;
-    lightPos.z += 10.0f; // Point light should be 10 distance units away from the front of the player's model
+    lightPos.z += 2.0f; // Point light should be 5 distance units away from the front of the player's model
     PointLight pointLight = PointLight(
         lightPos,        // position
         glm::vec3(1.0f), // light color
@@ -201,9 +197,10 @@ int main(void) {
         1.0f,            // specular strength
         16.0f            // specular phong
     );
-    // First POV Camera
+    // 1st POV camera
+    glm::vec3 firstPOVCameraPos = submarinePos;     // same position as player's model
     PerspectiveCamera firstPOVCamera = PerspectiveCamera(
-        submarinePos,                               // same position as player model
+        firstPOVCameraPos,                          // camera position
         glm::vec3(0.0f, 1.0f, 0.0f),                // worldup
         glm::vec3(0.0f, 0.0f, 1.0f),                // camera center
         glm::radians(60.0f),                        // field of view
@@ -211,64 +208,60 @@ int main(void) {
         0.1f,                                       // zNear
         100.0f                                      // zFar; can see farther unlike the third pov camera
     );
-    // Third POV Camera
-    glm::vec3 cameraPos = submarinePos;
-    cameraPos.z += 10.0f; // Third POV camera should be 10 distance units away from the player's model
+    // 3rd POV Camera
+    glm::vec3 thirdPOVCameraPos = submarinePos;
     PerspectiveCamera thirdPOVCamera = PerspectiveCamera(
-        cameraPos,
-        glm::vec3(0.0f, 1.0f, 0.0f),                // worldup
-        glm::vec3(0.0f, 0.0f, 1.0f),                // camera center
-        glm::radians(60.0f),                        // field of view
-        (float)screenHeight / (float)screenWidth,   // aspect ratio
-        0.1f,                                       // zNear
-        100.0f                                      // zFar; third pov camera cannot see as far unlike the first pov camera
+        thirdPOVCameraPos,
+        glm::vec3(0.0f, 1.0f, 0.0f),              
+        submarinePos, // point to player's model                              
+        glm::radians(60.0f),                        
+        (float)screenHeight / (float)screenWidth,   
+        0.1f,                                       
+        100.0f        // zFar; third pov camera cannot see as far unlike the first pov camera
     );
     // Player
     Player player = Player(
-        playerObj,       // model of player
-        firstPOVCamera,  // first pov camera of player
-        thirdPOVCamera,  // third pov camera of player
-        pointLight       // point light of player's model
+        &playerObj,       // model of player
+        &firstPOVCamera,  // first pov camera of player
+        &thirdPOVCamera,  // third pov camera of player
+        &pointLight       // point light of player's model
     );
 
     /******** PREPARE ENEMY MODELS ********/
-    //std::vector<Model> enemyModels;
-    //for (int i = 0; i < enemies.size(); i++) {
-    //    // Get texture/s of current enemy model
-    //    std::vector<std::string> enemyTextures;
-    //    for (int j = 1; j < enemies[i].size(); j++) {
-    //        enemyTextures.push_back(enemies[i][j]);
-    //    }
+    std::vector<Model> enemyModels;
+    for (int i = 0; i < enemies.size(); i++) {
+        // Get texture/s of current enemy model
+        std::vector<std::string> enemyTextures;
+        for (int j = 1; j < enemies[i].size(); j++) {
+            enemyTextures.push_back(enemies[i][j]);
+        }
 
-    //    // Empty normal map list (since enemy models do not have normal maps)
-    //    std::vector<std::string> emptyNormalMaps; 
+        // Store current enemy model
+        enemyModels.emplace_back(
+            enemies[i][0],
+            enemyTextures,
+            enemyConfigs[i][0],
+            enemyConfigs[i][1],
+            enemyConfigs[i][2]
+        );
+    }
 
-    //    // Store current enemy model
-    //    enemyModels.emplace_back(
-    //        enemies[i][0],
-    //        enemyTextures,
-    //        emptyNormalMaps,
-    //        enemyConfigs[i][0],
-    //        enemyConfigs[i][1],
-    //        enemyConfigs[i][2]
-    //    );
-    //}
+    // Mouse input variables for player's 3rd POV camera
+    bool firstMouseBtn = true;                // Avoids sudden camera movement on first mouse input
+    float prevX = (float)screenWidth / 2.0f;  // Previous mouse X offset
+    float prevY = (float)screenHeight / 2.0f; // Previous mouse Y offset
+    const float sensitivity = 0.1f;           // 3rd pov camera sensitivity when receiving mouse input
 
     // Enable OpenGL's depth testing to avoid models "overlapping"
     // when using different colors or textures for each model
     glEnable(GL_DEPTH_TEST);
 
-    //// For smooth fps movement in all devices
-    //double prevFrameTime = 0.0f;
-    //double theta_mod = 0.0f;
-
-    // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
-        // Render here
+        // Clear color and depth buffer per iteration
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /******** RENDER SKYBOX ********/
-        // Activate skybox shader
+        // Use skybox shader program
         skyboxShaderProgram.use();
 
         // Bind current POV camera to skybox shader
@@ -276,13 +269,12 @@ int main(void) {
         if (player.isPOVCameraUsed()) {
             // Check if 1st or 3rd POV camera
             if (player.isFirstPOVCameraUsed()) {
-                player.getFirstPOVCamera()->bindToShader(skyboxShaderProgram, true);
+                player.getFirstPOVCamera()->bindToShaderFirstPOV(skyboxShaderProgram, true);
             }
             else {
                 player.getThirdPOVCamera()->bindToShader(skyboxShaderProgram, true);
             }
         }
-        // Bind top view camera
         else {
             topViewCamera.bindToShader(skyboxShaderProgram, true);
         }
@@ -291,36 +283,154 @@ int main(void) {
         whirlpoolSkybox.draw(skyboxShaderProgram);
 
         /******** RENDER MODEL ********/
-        // Activate model shader
+        // Use main (model) shader program
         mainShaderProgram.use();
 
-        // Bind directional light to shader
-        directionalLight.bindToShader(mainShaderProgram);
-
-        // Bind top view camera to shader if player POV camera is not currently used
+        // Bind top view camera to main shader if player's POV camera is currently not used
         if (!player.isPOVCameraUsed()) {
             topViewCamera.bindToShader(mainShaderProgram);
         }
 
-        // Render player model
+        // Bind directional light to shader
+        directionalLight.bindToShader(mainShaderProgram);
+
+        // Draw player model
         player.draw(mainShaderProgram);
 
-        // Render enemy models
-        /*for (int i = 0; i < enemyModels.size(); i++) {
+        // Draw enemy models
+        for (int i = 0; i < enemyModels.size(); i++) {
             enemyModels[i].draw(mainShaderProgram);
-        }*/
-
-        //// Delta time for uniformity in rotation across machines
-        //double currentTime = glfwGetTime();
-        //double deltaTime = currentTime - prevFrameTime;
-        //prevFrameTime = currentTime;
-        //theta_mod -= 20.0f * (float)deltaTime;
+        }
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
 
-        // Poll for and process events
+        // Poll for and process events (inputs)
         glfwPollEvents();
+
+        /******** MOUSE INPUTS ********/
+        // If player's 3rd POV camera is currently used
+        if (player.isPOVCameraUsed() && !player.isFirstPOVCameraUsed()) {
+            // Get current mouse X and Y coordinates
+            double posX; 
+            double posY;
+            glfwGetCursorPos(window, &posX, &posY);
+
+            // If first mouse cursor input for the window instance
+            if (firstMouseBtn || prevX != posX || prevY != posY) {
+                if (firstMouseBtn) {
+                    // Set current mouse cursor X and Y coordinates as previous coordinates
+                    prevX = posX;
+                    prevY = posY;
+
+                    // To avoid sudden camera movements
+                    firstMouseBtn = false;
+                }
+
+                // Get the movement offset between the last and current frame
+                // Adjusted with sensitivity
+                float offsetX = (posX - prevX) * sensitivity;
+                float offsetY = (prevY - posY) * sensitivity;
+
+                // Set current coordinates as previous coordinates for succeeding mouse inputs
+                prevX = posX;
+                prevY = posY;
+
+                // Rotate 3rd pov camera
+                player.rotateThirdPOVCameraOnMouse(offsetX, offsetY);
+            }
+        }
+
+        /******** KEYBOARD INPUTS ********/
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+            // Check first if top view camera was currently used
+            if (!player.isPOVCameraUsed()) {
+                // Change back to using player POV camera
+                player.enableCamera();
+            }
+            else {
+                // Swap between 1st and 3rd POV cameras
+                player.changeCamera();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+            // Swap between player POV camera and top view camera
+            player.disableCamera();
+        }
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            // If currently used camera view is top view
+            if (!player.isPOVCameraUsed()) {
+                // Move top view camera up
+                glm::vec3 topViewCamPos = topViewCamera.getPosition();
+                glm::vec3 topViewCamCenter = topViewCamera.getCenter();
+                topViewCamPos.z += topViewSpeed;
+                topViewCamCenter.z += topViewSpeed;
+                topViewCamera.setPosition(topViewCamPos);
+                topViewCamera.setCenter(topViewCamCenter);
+            }
+            else {
+                // Move player forward
+                player.moveForward();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            if (!player.isPOVCameraUsed()) {
+                // Move top view camera down
+                glm::vec3 topViewCamPos = topViewCamera.getPosition();
+                glm::vec3 topViewCamCenter = topViewCamera.getCenter();
+                topViewCamPos.z -= topViewSpeed;
+                topViewCamCenter.z -= topViewSpeed;
+                topViewCamera.setPosition(topViewCamPos);
+                topViewCamera.setCenter(topViewCamCenter);
+            }
+            else {
+                // Move player backwards
+                player.moveBackwards();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            if (!player.isPOVCameraUsed()) {
+                // Move top view camera to the left
+                glm::vec3 topViewCamPos = topViewCamera.getPosition();
+                glm::vec3 topViewCamCenter = topViewCamera.getCenter();
+                topViewCamPos.x += topViewSpeed;
+                topViewCamCenter.x += topViewSpeed;
+                topViewCamera.setPosition(topViewCamPos);
+                topViewCamera.setCenter(topViewCamCenter);
+            }
+            else {
+                // Turn player to the left
+                player.turnLeft();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            if (!player.isPOVCameraUsed()) {
+                // Move top view camera to the right
+                glm::vec3 topViewCamPos = topViewCamera.getPosition();
+                glm::vec3 topViewCamCenter = topViewCamera.getCenter();
+                topViewCamPos.x -= topViewSpeed;
+                topViewCamCenter.x -= topViewSpeed;
+                topViewCamera.setPosition(topViewCamPos);
+                topViewCamera.setCenter(topViewCamCenter);
+            }
+            else {
+                // Turn player to the right
+                player.turnRight();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+            // If player POV camera is currently used
+            if (player.isPOVCameraUsed()) {
+                // Ascend player
+                player.ascend();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+            if (player.isPOVCameraUsed()) {
+                // Descend player
+                player.descend();
+            }
+        }
     }
 
     // Some clean up (OPTIONAL, but recommended)

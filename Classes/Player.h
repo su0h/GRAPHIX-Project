@@ -4,18 +4,6 @@
 	Player class implementation. Holds every player-related functionality.
  */
 class Player{
-	// TODO: Implement this
-	/*
-		- Light intensity control
-		- Mouse control
-		- Submarine control
-		- Camera control (?)
-
-		- Control point light intensity
-		- Control 3rd person view using mouse (cannot see far)
-		- Control 1st person view using keeb (can see further; single color)
-		- Control ortho camera using WASD
-	*/
 private:
 	// The model representation of the player in the screen
 	Model* model;
@@ -25,7 +13,7 @@ private:
 	// 3rd POV camera; rotates spherically around the player's model
 	PerspectiveCamera* thirdPOVCamera;
 	// Distance of third POV camera from player's model
-	const float thirdPOVCameraDist = 10.0f;
+	const float thirdPOVCameraDist = 30.0f;
 	// Determines if player's POV camera is currently being used as the view or not
 	bool showPlayerPOVCamera;
 	// Determines if the current POV camera of player being used is first or third POV camera
@@ -34,7 +22,7 @@ private:
 	// Model and first POV camera movement speed
 	const float moveSpeed = 0.5f;
 	// Model and first POV camera rotation speed
-	const float rotSpeed = 10.0f;
+	const float rotSpeed = 0.5f;
 
 	// Point light which points in front of the player's model
 	PointLight* pointLight;
@@ -70,19 +58,19 @@ private:
 public:
 	// Instantiates a Player object.
 	Player(
-		Model model,
-		PerspectiveCamera firstPOVCamera, 
-		PerspectiveCamera thirdPOVCamera, 
-		PointLight pointLight,
+		Model* model,
+		PerspectiveCamera* firstPOVCamera, 
+		PerspectiveCamera* thirdPOVCamera, 
+		PointLight* pointLight,
 		bool showPlayerPOVCamera = false, // Start of the program should use player pov camera first
-		bool showFirstPOVCamera = false,  // Player's third POV camera is used first as well
+		bool showFirstPOVCamera = true,  // Player's third POV camera is used first as well
 		int lightIntensityValIndex = 1    // Start at medium light intensity
 	) {
 		// Initialize attributes
-		this->model = &model;
-		this->firstPOVCamera = &firstPOVCamera;
-		this->thirdPOVCamera = &thirdPOVCamera;
-		this->pointLight = &pointLight;
+		this->model = model;
+		this->firstPOVCamera = firstPOVCamera;
+		this->thirdPOVCamera = thirdPOVCamera;
+		this->pointLight = pointLight;
 		this->showPlayerPOVCamera = showPlayerPOVCamera;
 		this->showFirstPOVCamera = showFirstPOVCamera;
 		this->lightIntensityValIndex = lightIntensityValIndex;
@@ -90,20 +78,20 @@ public:
 
 	// Draws the player's elements using the shader.
 	void draw(Shader shader) {
-		// Bind the point light to the shader
-		this->pointLight->bindToShader(shader);
-		
 		// Bind the perspective camera being currently used (1st or 3rd POV)
 		// Only if current view is not in orthographic top view (bird's eye view)
 		if (this->showPlayerPOVCamera) {
 			// If first POV camera is being currently used
 			if (this->showFirstPOVCamera) {
-				this->firstPOVCamera->bindToShader(shader);
+				this->firstPOVCamera->bindToShaderFirstPOV(shader, false);
 			}
 			else {
 				this->thirdPOVCamera->bindToShader(shader);
 			}
 		}
+
+		// Bind the point light to the shader
+		this->pointLight->bindToShader(shader);
 		
 		// Draw the player's model
 		this->model->draw(shader);
@@ -122,15 +110,15 @@ public:
 		firstPOVCameraPos += firstPOVCameraCenter * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		// Update the position of the third POV camera
-		updateThirdPOVCameraPositionOnModel();
+		//// Update the position of the third POV camera
+		//updateThirdPOVCameraPositionOnModel();
 
-		// Update the position of the point light
-		updatePointLightPositionOnModel();
+		//// Update the position of the point light
+		//updatePointLightPositionOnModel();
 	}
 
 	// Moves the player backwards.
-	void moveBackward() {
+	void moveBackwards() {
 		// Move the player's model backwards
 		glm::vec3 modelPos = this->model->getPosition();
 		modelPos.z -= this->moveSpeed;
@@ -142,18 +130,18 @@ public:
 		firstPOVCameraPos -= firstPOVCameraCenter * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		// Update the position of the third POV camera
-		updateThirdPOVCameraPositionOnModel();
+		//// Update the position of the third POV camera
+		//updateThirdPOVCameraPositionOnModel();
 
-		// Update the position of the point light
-		updatePointLightPositionOnModel();
+		//// Update the position of the point light
+		//updatePointLightPositionOnModel();
 	}
 
 	// Rotates the player to the left.
 	void turnLeft() {
 		// Rotate the player's model to the left
 		glm::vec3 modelRot = this->model->getRotation();
-		modelRot.x -= this->rotSpeed;
+		modelRot.y += this->rotSpeed;
 		this->model->setRotation(modelRot);
 
 		// Rotate the first POV camera to the left
@@ -161,15 +149,15 @@ public:
 		float pitch = this->firstPOVCamera->getPitch();
 		this->firstPOVCamera->setCenter(pitch, yaw);
 
-		// Update the position of the point light
-		updatePointLightPositionOnModel();
+		//// Update the position of the point light
+		//updatePointLightPositionOnModel();
 	}
 
 	// Rotates the player to the right.
 	void turnRight() {
 		// Rotate the player's model to the right
 		glm::vec3 modelRot = this->model->getRotation();
-		modelRot.x += this->rotSpeed;
+		modelRot.y -= this->rotSpeed;
 		this->model->setRotation(modelRot);
 
 		// Rotate the first POV camera to the right
@@ -177,8 +165,8 @@ public:
 		float pitch = this->firstPOVCamera->getPitch();
 		this->firstPOVCamera->setCenter(pitch, yaw);
 
-		// Update the position of the point light
-		updatePointLightPositionOnModel();
+		//// Update the position of the point light
+		//updatePointLightPositionOnModel();
 	}
 
 	// Ascends the player.
@@ -194,11 +182,11 @@ public:
 		firstPOVCameraPos += firstPOVCameraUp * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		// Update the position of the third POV camera
-		updateThirdPOVCameraPositionOnModel();
+		//// Update the position of the third POV camera
+		//updateThirdPOVCameraPositionOnModel();
 
-		// Update the position of the point light
-		updatePointLightPositionOnModel();
+		//// Update the position of the point light
+		//updatePointLightPositionOnModel();
 	}
 
 	// Descends the player.
@@ -214,11 +202,11 @@ public:
 		firstPOVCameraPos -= firstPOVCameraUp * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		// Update the position of the third POV camera
-		updateThirdPOVCameraPositionOnModel();
+		//// Update the position of the third POV camera
+		//updateThirdPOVCameraPositionOnModel();
 
-		// Update the position of the point light 
-		updatePointLightPositionOnModel();
+		//// Update the position of the point light 
+		//updatePointLightPositionOnModel();
 	}
 
 	// Rotates the player's third POV camera based on mouse inputs.
@@ -226,8 +214,8 @@ public:
 		// Update the pitch and yaw values of the third POV camera
 		float pitch = this->thirdPOVCamera->getPitch();
 		float yaw = this->thirdPOVCamera->getYaw();
-		pitch += offsetY;
-		yaw += offsetX;
+		pitch += offsetY; // rotate 3rd pov camera up or down
+		yaw += offsetX;   // rotate 3rd pov camera left or right
 		this->thirdPOVCamera->setPitch(pitch);
 		this->thirdPOVCamera->setYaw(yaw);
 
@@ -267,9 +255,14 @@ public:
 		);
 	}
 
-	// Toggles the player's POV camera; if it is to be used or not.
-	void toggleCamera() {
-		this->showPlayerPOVCamera = !this->showPlayerPOVCamera;
+	// Enables the player's POV camera; if it is to be used or not.
+	void enableCamera() {
+		this->showPlayerPOVCamera = true;
+	}
+
+	// Disables the player's POV camera; top view camera is going to be used.
+	void disableCamera() {
+		this->showPlayerPOVCamera = false;
 	}
 
 	// Returns the boolean value indicating if player's POV camera is currently being used or not.
