@@ -101,12 +101,12 @@ void main() {
 	result += computePointLight(pointLight, normal, fragPos, viewDir);
 
 	// Apply everything to the fragment
+	// If model has textures, apply texture
 	if (hasTexture && !showColor) {
-		// If model has textures, apply texture
 		FragColor = vec4(result, 1.0f) * pixelColor;       
+	// If model has no textures OR model color is toggled, apply color
 	} else {
-		// If model has no textures OR model color is toggled, apply color
-		FragColor = vec4(result * modelColor, 1.0f);  
+		FragColor = vec4(result * modelColor, 1.0f);
 	}
 }
 

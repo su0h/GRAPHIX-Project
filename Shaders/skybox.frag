@@ -18,10 +18,10 @@ uniform vec3 skyboxColor;
 
 void main() {
 	// If the skybox uses textures, use the texture
-    if (showColor) {
-        FragColor = vec4(skyboxColor, 1.0);
-	// If the skybox color is toggled, apply color instead
-    } else {
+    if (!showColor) {
         FragColor = texture(skybox, texCoord);
+	// If the skybox color is toggled, apply color to texture
+    } else {
+        FragColor = texture(skybox, texCoord) * vec4(skyboxColor, 1.0);
     }
 }

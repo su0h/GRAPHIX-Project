@@ -149,7 +149,7 @@ public:
     // Instantiates a Skybox object.
 	Skybox(
         std::vector<std::string> skyboxFaces, 
-        glm::vec3 color = glm::vec3(1.0f)
+        glm::vec3 color = glm::vec3(0.0f, 1.0f, 0.0f)
     ) {
         // Initialize color
         this->color = color;
