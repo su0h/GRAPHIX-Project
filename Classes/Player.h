@@ -205,22 +205,27 @@ public:
 
 	// Ascends the player.
 	void ascend() {
-		// Move the player's model upwards
+		// Get position of player's model
 		glm::vec3 modelPos = this->model->getPosition();
-		modelPos.y += this->moveSpeed;
-		this->model->setPosition(modelPos);
 
-		// Move the first POV camera upwards
-		glm::vec3 firstPOVCameraPos = this->firstPOVCamera->getPosition();
-		glm::vec3 firstPOVCameraUp = this->firstPOVCamera->getWorldUp();
-		firstPOVCameraPos += firstPOVCameraUp * this->moveSpeed;
-		this->firstPOVCamera->setPosition(firstPOVCameraPos);
+		// Only ascend if current y-coordinate position is below 0.
+		if (modelPos.y < 0) {
+			// Move the player's model upwards
+			modelPos.y += this->moveSpeed;
+			this->model->setPosition(modelPos);
 
-		// Update the position of the third POV camera
-		updateThirdPOVCameraPositionOnModel();
+			// Move the first POV camera upwards
+			glm::vec3 firstPOVCameraPos = this->firstPOVCamera->getPosition();
+			glm::vec3 firstPOVCameraUp = this->firstPOVCamera->getWorldUp();
+			firstPOVCameraPos += firstPOVCameraUp * this->moveSpeed;
+			this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		// Update the position of the point light
-		updatePointLightPositionOnModel();
+			// Update the position of the third POV camera
+			updateThirdPOVCameraPositionOnModel();
+
+			// Update the position of the point light
+			updatePointLightPositionOnModel();
+		}
 	}
 
 	// Descends the player.

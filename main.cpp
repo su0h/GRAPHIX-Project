@@ -521,14 +521,19 @@ int main(void) {
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
             // If player POV camera is currently used
             if (player.isPOVCameraUsed()) {
-                // Descend player
-                player.descend();
+                // Ascend player
+                player.ascend();
+
+                // Print current depth of player's model
+                std::cout << "Depth: " << player.getModel()->getPosition().y << std::endl;
             }
         }
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
             if (player.isPOVCameraUsed()) {
-                // Ascend player
-                player.ascend();
+                // Descend player
+                player.descend();
+
+                std::cout << "Depth: " << player.getModel()->getPosition().y << std::endl;
             }
         }
         if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
