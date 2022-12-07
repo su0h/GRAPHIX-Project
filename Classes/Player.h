@@ -61,11 +61,18 @@ private:
 
 	// Updates the position of the point light based on the player model's new transformation matrix
 	void updatePointLightPositionOnModel() {
-		glm::vec4 oldLightPos = glm::vec4(this->pointLight->getPosition(), 1.0f);
-		glm::mat4 transform = this->model->computeTransMatrix();
-		glm::vec3 newLightPos = glm::vec3(transform * oldLightPos);
-		newLightPos.z += this->lightDist;
-		this->pointLight->setPosition(newLightPos);
+		// Get position of player's model
+		glm::vec3 modelPos = this->model->getPosition();
+
+		// Get x-axis rotation value of player's model
+		float modelRotX = this->model->getRotation().x;
+
+		// Calculate new position of light based on current position and x-axis rotation of model
+		modelPos.x += -sin(glm::radians(modelRotX)) * this->rotSpeed;
+		modelPos.z += -cos(glm::radians(modelRotX)) * this->rotSpeed;
+
+		// Set new position of light
+		this->pointLight->setPosition(modelPos);
 	}
 
 public:
@@ -87,6 +94,9 @@ public:
 		this->showPlayerPOVCamera = showPlayerPOVCamera;
 		this->showFirstPOVCamera = showFirstPOVCamera;
 		this->lightIntensityValIndex = lightIntensityValIndex;
+
+		// Update position of point light for it to be facing in front of the model.
+		updatePointLightPositionOnModel();
 
 		// Set intensity of light to initial light intensity value
 		this->pointLight->setLightColor(
@@ -135,8 +145,8 @@ public:
 		// Update the position of the third POV camera
 		updateThirdPOVCameraPositionOnModel();
 
-		//// Update the position of the point light
-		//updatePointLightPositionOnModel();
+		// Update the position of the point light
+		updatePointLightPositionOnModel();
 	}
 
 	// Moves the player backwards.
@@ -157,8 +167,8 @@ public:
 		// Update the position of the third POV camera
 		updateThirdPOVCameraPositionOnModel();
 
-		//// Update the position of the point light
-		//updatePointLightPositionOnModel();
+		// Update the position of the point light
+		updatePointLightPositionOnModel();
 	}
 
 	// Rotates the player to the left.
@@ -173,8 +183,8 @@ public:
 		float pitch = this->firstPOVCamera->getPitch();
 		this->firstPOVCamera->setCenter(pitch, yaw);
 
-		//// Update the position of the point light
-		//updatePointLightPositionOnModel();
+		// Update the position of the point light
+		updatePointLightPositionOnModel();
 	}
 
 	// Rotates the player to the right.
@@ -189,8 +199,8 @@ public:
 		float pitch = this->firstPOVCamera->getPitch();
 		this->firstPOVCamera->setCenter(pitch, yaw);
 
-		//// Update the position of the point light
-		//updatePointLightPositionOnModel();
+		// Update the position of the point light
+		updatePointLightPositionOnModel();
 	}
 
 	// Ascends the player.
@@ -209,8 +219,8 @@ public:
 		// Update the position of the third POV camera
 		updateThirdPOVCameraPositionOnModel();
 
-		//// Update the position of the point light
-		//updatePointLightPositionOnModel();
+		// Update the position of the point light
+		updatePointLightPositionOnModel();
 	}
 
 	// Descends the player.
@@ -229,8 +239,8 @@ public:
 		// Update the position of the third POV camera
 		updateThirdPOVCameraPositionOnModel();
 
-		//// Update the position of the point light 
-		//updatePointLightPositionOnModel();
+		// Update the position of the point light 
+		updatePointLightPositionOnModel();
 	}
 
 	// Rotates the player's third POV camera based on mouse inputs.

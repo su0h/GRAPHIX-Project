@@ -187,7 +187,7 @@ int main(void) {
     );
     // Point light
     glm::vec3 lightPos = submarinePos;
-    lightPos.z += 2.0f; // Point light should be 5 distance units away from the front of the player's model
+    lightPos.z += 10.0f; // point light should be 5 distance units away from the front of the player's model
     PointLight pointLight = PointLight(
         lightPos,        // position
         glm::vec3(1.0f), // light color
@@ -208,6 +208,7 @@ int main(void) {
         800.0f                                      // zFar; can see farther unlike the third pov camera
     );
     firstPOVCamera.setCenter(0.0f, 90.0f);          // initially rotate 1st POV camera 90 degrees to the right
+                                                    // For it to be facing as well to where the player's model is facing
     // 3rd POV Camera
     glm::vec3 thirdPOVCameraPos = submarinePos;
     PerspectiveCamera thirdPOVCamera = PerspectiveCamera(
@@ -247,10 +248,17 @@ int main(void) {
     }
 
     // Mouse input variables for player's 3rd POV camera
-    bool firstMouseBtn = true;                // Avoids sudden camera movement on first mouse input
-    float prevX = (float)screenWidth / 2.0f;  // Previous mouse X offset
-    float prevY = (float)screenHeight / 2.0f; // Previous mouse Y offset
-    const float sensitivity = 0.1f;           // 3rd pov camera sensitivity when receiving mouse input
+    bool firstMove = true;                            // Avoids sudden camera movement on first mouse input
+    float thirdPOVPrevX = (float)screenWidth / 2.0f;  // Previous mouse X offset
+    float thirdPOVPrevY = (float)screenHeight / 2.0f; // Previous mouse Y offset
+
+    // Mouse input variables for top view camera (drag control)
+    bool firstClick = true; // Determines if its the left mouse button click that initializes the drag control
+    float topViewPrevX = (float)screenWidth / 2.0f;
+    float topViewPrevY = (float)screenHeight / 2.0f;
+
+    // Camera sensitivity when receiving mouse input
+    const float sensitivity = 0.1f;                   
 
     // Previous swap time between player's 1st and 3rd POV cameras; for cooldown
     float prevCamSwapTime = 0.0f;
@@ -302,6 +310,20 @@ int main(void) {
             topViewCamera.bindToShader(mainShaderProgram);
         }
 
+        // If first POV camera is currently used
+        if (player.isPOVCameraUsed() && player.isFirstPOVCameraUsed()) {
+            // Render enemy models with shade of green for first POV
+            for (int i = 0; i < enemyModels.size(); i++) {
+                enemyModels[i].toggleColor(true);
+            }
+        }
+        else {
+            // Third POV or top view camera is used, render enemy models with default texture color
+            for (int i = 0; i < enemyModels.size(); i++) {
+                enemyModels[i].toggleColor(false);
+            }
+        }
+
         // Bind directional light to shader
         directionalLight.bindToShader(mainShaderProgram);
 
@@ -328,27 +350,70 @@ int main(void) {
             glfwGetCursorPos(window, &posX, &posY);
 
             // If first mouse cursor input for the window instance
-            if (firstMouseBtn || prevX != posX || prevY != posY) {
-                if (firstMouseBtn) {
+            if (firstMove || thirdPOVPrevX != posX || thirdPOVPrevY != posY) {
+                if (firstMove) {
                     // Set current mouse cursor X and Y coordinates as previous coordinates
-                    prevX = posX;
-                    prevY = posY;
+                    thirdPOVPrevX = posX;
+                    thirdPOVPrevY = posY;
 
                     // To avoid sudden camera movements
-                    firstMouseBtn = false;
+                    firstMove = false;
                 }
 
                 // Get the movement offset between the last and current frame
                 // Adjusted with sensitivity
-                float offsetX = (posX - prevX) * sensitivity;
-                float offsetY = (prevY - posY) * sensitivity;
+                float offsetX = (posX - thirdPOVPrevX) * sensitivity;
+                float offsetY = (thirdPOVPrevY - posY) * sensitivity;
 
                 // Set current coordinates as previous coordinates for succeeding mouse inputs
-                prevX = posX;
-                prevY = posY;
+                thirdPOVPrevX = posX;
+                thirdPOVPrevY = posY;
 
                 // Rotate 3rd pov camera
                 player.rotateThirdPOVCameraOnMouse(offsetX, offsetY);
+            }
+        }
+        // If top view camera is currently used
+        else if (!player.isPOVCameraUsed()) {
+            // If left mouse button is currently clicked and hold
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+                // Get current mouse X and Y coordinates
+                double posX;
+                double posY;
+                glfwGetCursorPos(window, &posX, &posY);
+
+                // If first left mouse click and hold; drag control initialized
+                if (firstClick) {
+                    // Set current mouse cursor X and Y coordinates as previous coordinates
+                    topViewPrevX = posX;
+                    topViewPrevY = posY;
+
+                    // To avoid sudden camera movements
+                    firstClick = false;
+                }
+
+                // Get the movement offset between the last and current frame
+                // Adjusted with sensitivity; negative for opposite direction because of dragging
+                float offsetX = (topViewPrevX - posX) * -sensitivity;
+                float offsetY = (topViewPrevY - posY) * -sensitivity;
+
+                // Set current coordinates as previous coordinates for succeeding mouse inputs
+                topViewPrevX = posX;
+                topViewPrevY = posY;
+
+                // Move top view camera
+                glm::vec3 topViewCamPos = topViewCamera.getPosition();
+                glm::vec3 topViewCamCenter = topViewCamera.getCenter();
+                topViewCamPos.x += offsetX;
+                topViewCamCenter.x += offsetX;
+                topViewCamPos.z += offsetY;
+                topViewCamCenter.z += offsetY;
+                topViewCamera.setPosition(topViewCamPos);
+                topViewCamera.setCenter(topViewCamCenter);
+            }
+            else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+                // Reset first left mouse button click indicator for succeeding inputs
+                firstClick = true;
             }
         }
 
