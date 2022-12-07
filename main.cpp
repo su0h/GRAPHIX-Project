@@ -177,11 +177,10 @@ int main(void) {
     /******** PREPARE PLAYER ********/
     // Model
     std::vector<std::string> playerTextures{ submarineTexturePath };
-    std::vector<std::string> playerNormalMaps{ submarineNormalMapPath };
-    Model playerObj = Model(
+    Model playerObj(
         submarineObjPath,                   // path to .obj
         playerTextures,                     // list of textures
-        playerNormalMaps,                   // list of normal mappings
+        submarineNormalMapPath,             // path to normal map texture
         submarinePos,                       // position
         submarineRot,                       // rotation
         submarineScale                      // scale
