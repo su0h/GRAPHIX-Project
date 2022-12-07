@@ -37,13 +37,31 @@ private:
 
 	// Updates the position of the player's third POV camera based on the player model's new position
 	void updateThirdPOVCameraPositionOnModel() {
-		glm::vec3 thirdPOVCameraPos = this->model->getPosition();
-		float yaw = this->thirdPOVCamera->getYaw();
+		// Get position and rotation vectors of player's model
+		glm::vec3 modelPos = this->model->getPosition();
+		glm::vec3 modelRot = this->model->getRotation();
+
+		// TEMPORARY: Get current pitch and yaw values of third POV camera
 		float pitch = this->thirdPOVCamera->getPitch();
-		thirdPOVCameraPos.x *= sin(glm::radians(yaw)) * cos(glm::radians(pitch)) * this->thirdPOVCameraDist;
-		thirdPOVCameraPos.y *= sin(glm::radians(pitch)) * this->thirdPOVCameraDist;
-		thirdPOVCameraPos.z *= cos(glm::radians(yaw)) * cos(glm::radians(pitch)) * -this->thirdPOVCameraDist;
-		this->thirdPOVCamera->setPosition(thirdPOVCameraPos);
+		float yaw = this->thirdPOVCamera->getYaw();
+
+		// Update position of third POV camera based on new position and rotation of player's model
+		// Should be n distance units away from the player's model
+		glm::vec3 cameraPos = this->thirdPOVCamera->getPosition();
+		/*cameraPos.x = modelPos.x + -sin(glm::radians(modelRot.x)) * thirdPOVCameraDist; 
+		cameraPos.y = modelPos.y + 0.75f;
+		cameraPos.z = modelPos.z + -cos(glm::radians(modelRot.z)) * thirdPOVCameraDist;*/
+
+		// TEMPORARY
+		cameraPos.x = modelPos.x + sin(glm::radians(yaw)) * cos(glm::radians(pitch)) * this->thirdPOVCameraDist;
+		cameraPos.y = modelPos.y + sin(glm::radians(pitch)) * this->thirdPOVCameraDist;
+		cameraPos.z = modelPos.z + cos(glm::radians(yaw)) * cos(glm::radians(pitch)) * -this->thirdPOVCameraDist;
+
+		// Set new position of third POV camera
+		this->thirdPOVCamera->setPosition(cameraPos);
+
+		// Make third POV camera point to model's new position
+		this->thirdPOVCamera->setCenter(modelPos);
 	}
 
 	// Updates the position of the point light based on the player model's new transformation matrix
@@ -101,7 +119,9 @@ public:
 	void moveForward() {
 		// Move the player's model forward
 		glm::vec3 modelPos = this->model->getPosition();
-		modelPos.z += this->moveSpeed;
+		glm::vec3 modelRot = this->model->getRotation();
+		modelPos.x += -sin(glm::radians(modelRot.y)) * -this->moveSpeed;
+		modelPos.z += -cos(glm::radians(modelRot.y)) * -this->moveSpeed;
 		this->model->setPosition(modelPos);
 
 		// Move the first POV camera forward
@@ -110,8 +130,8 @@ public:
 		firstPOVCameraPos += firstPOVCameraCenter * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		//// Update the position of the third POV camera
-		//updateThirdPOVCameraPositionOnModel();
+		// Update the position of the third POV camera
+		updateThirdPOVCameraPositionOnModel();
 
 		//// Update the position of the point light
 		//updatePointLightPositionOnModel();
@@ -121,7 +141,9 @@ public:
 	void moveBackwards() {
 		// Move the player's model backwards
 		glm::vec3 modelPos = this->model->getPosition();
-		modelPos.z -= this->moveSpeed;
+		glm::vec3 modelRot = this->model->getRotation();
+		modelPos.x += sin(glm::radians(modelRot.y)) * -this->moveSpeed;
+		modelPos.z += cos(glm::radians(modelRot.y)) * -this->moveSpeed;
 		this->model->setPosition(modelPos);
 
 		// Move the first POV camera backwards
@@ -130,8 +152,8 @@ public:
 		firstPOVCameraPos -= firstPOVCameraCenter * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		//// Update the position of the third POV camera
-		//updateThirdPOVCameraPositionOnModel();
+		// Update the position of the third POV camera
+		updateThirdPOVCameraPositionOnModel();
 
 		//// Update the position of the point light
 		//updatePointLightPositionOnModel();
@@ -182,8 +204,8 @@ public:
 		firstPOVCameraPos += firstPOVCameraUp * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		//// Update the position of the third POV camera
-		//updateThirdPOVCameraPositionOnModel();
+		// Update the position of the third POV camera
+		updateThirdPOVCameraPositionOnModel();
 
 		//// Update the position of the point light
 		//updatePointLightPositionOnModel();
@@ -202,8 +224,8 @@ public:
 		firstPOVCameraPos -= firstPOVCameraUp * this->moveSpeed;
 		this->firstPOVCamera->setPosition(firstPOVCameraPos);
 
-		//// Update the position of the third POV camera
-		//updateThirdPOVCameraPositionOnModel();
+		// Update the position of the third POV camera
+		updateThirdPOVCameraPositionOnModel();
 
 		//// Update the position of the point light 
 		//updatePointLightPositionOnModel();
@@ -219,23 +241,31 @@ public:
 		this->thirdPOVCamera->setPitch(pitch);
 		this->thirdPOVCamera->setYaw(yaw);
 
-		// Get new camera direction based on distance and rotation values
-		glm::vec3 direction;
+		// Get new camera position based on distance and rotation values
+		glm::vec3 newPos;
 
 		// Make camera rotate left or right around the main object
-		direction.x = this->thirdPOVCameraDist * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+		newPos.x = this->thirdPOVCameraDist * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
 		// Make camera rotate up and down around the main object
 		// Positive so that the camera will rotate downwards when the cursor goes up
-		direction.y = this->thirdPOVCameraDist * sin(glm::radians(pitch));
+		newPos.y = this->thirdPOVCameraDist * sin(glm::radians(pitch));
 
 		// Negative so that the camera will look in front of the object at start
-		direction.z = -this->thirdPOVCameraDist * cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+		newPos.z = -this->thirdPOVCameraDist * cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-		// Update the position vector only of the third POV camera
-		// Camera center will not be changed so that the rotated camera will still point at the main object
-		// This makes the camera rotate around the object in a spherical manner
-		this->thirdPOVCamera->setPosition(direction);
+		// Get position of player's model
+		glm::vec3 modelPos = this->model->getPosition();
+
+		// Adjust position of third POV camera based on current position of player's model since it moves
+		// In case the model changed its position recently
+		newPos += modelPos;
+
+		// Update the position vector of the third POV camera
+		this->thirdPOVCamera->setPosition(newPos);
+
+		// Point at position of model; in case it was changed recently
+		this->thirdPOVCamera->setCenter(modelPos);
 	}
 
 	// Changes (cycles through) the intensity of the model's point light.

@@ -281,7 +281,7 @@ private:
                 &imgWidth,        // Pointer to image width
                 &imgHeight,       // Pointer to image height
                 &colorChannels,   // Pointer to color channels
-                0                 
+                0
             );
 
             // If texture is successfully loaded
