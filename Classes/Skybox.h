@@ -174,12 +174,16 @@ public:
         // Bind the skybox VAO to the shader
         glBindVertexArray(this->VAO);
 
-        if (this->showColor) {
-            shader.setBool("showColor", this->showColor);
+        // Tell the shader to render skybox color or not
+        shader.setBool("showColor", this->showColor);
+
+        // If the skybox color must be shown
+        if (this->showColor)
+            // Link color
             shader.setVec3("skyboxColor", this->color);
-        } 
-        else
-            this->texture.bind();
+
+        // Bind skybox texture
+        this->texture.bind();
 
         // Draw skybox
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
