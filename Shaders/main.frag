@@ -74,15 +74,6 @@ vec3 computePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir
 vec3 computeDirectLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 
 void main() {
-	// Get current pixel color
-	vec4 pixelColor = texture(tex0, texCoord);
-
-	// Alpha Cutoff
-	if (pixelColor.a < 0.1) {
-		// Discard every pixel below 0.1 in alpha
-		discard;
-	}
-
 	// Normalize the received normals coordinates
 	vec3 normal;
 	if (hasNormalMapping) {
@@ -102,10 +93,20 @@ void main() {
 
 	// Apply everything to the fragment
 	// If model has textures, apply texture
-	if (hasTexture && !showColor) {
+	if (!showColor && hasTexture) {
+        // Get current pixel color
+        vec4 pixelColor = texture(tex0, texCoord);
+
+        // Alpha Cutoff
+        if (pixelColor.a < 0.1) {
+            // Discard every pixel below 0.1 in alpha
+            discard;
+        }
+        
 		FragColor = vec4(result, 1.0f) * pixelColor;       
 	// If model has no textures OR model color is toggled, apply color
 	} else {
+		// FragColor = vec4(result * modelColor, 1.0f);
 		FragColor = vec4(result * modelColor, 1.0f);
 	}
 }

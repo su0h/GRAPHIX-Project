@@ -143,10 +143,15 @@
     <ClInclude Include="Classes\Player.h" />
     <ClInclude Include="Classes\Shader.h" />
     <ClInclude Include="Classes\Skybox.h" />
+    <ClInclude Include="Classes\TextsHandler.h" />
     <ClInclude Include="Classes\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="3D\model_paths.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\text.frag" />
+    <None Include="Shaders\text.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

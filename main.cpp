@@ -16,6 +16,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+/******** OPENGL TEXT RENDERING ********/
+// Taken from: https://github.com/capnramses/opengl_text_rendering
+// *approved by sir for use as well
+#include "Text/text.cpp"
+
 /******** ADDITIONAL CLASSES ********/
 #include "Classes/Shader.h"  // Shader Class
 #include "Classes/Camera.h"  // Camera Class
@@ -116,6 +121,10 @@ const char* fragPath = "Shaders/main.frag";
 const char* skyboxVertPath = "Shaders/skybox.vert";
 const char* skyboxFragPath = "Shaders/skybox.frag";
 
+// Text shader paths
+const char* textVertPath = "Shaders/text.vert";
+const char* textFragPath = "Shaders/text.frag";
+
 /*
     Main (driver) function.
  */
@@ -145,8 +154,9 @@ int main(void) {
     Skybox whirlpoolSkybox = Skybox(whirlpoolSkyboxFaces);
 
     /******** PREPARE SHADERS ********/
-    Shader mainShaderProgram = Shader(vertPath, fragPath);               // 3D model shader
-    Shader skyboxShaderProgram = Shader(skyboxVertPath, skyboxFragPath); // Skybox shader
+    Shader textShaderProgram = Shader(textVertPath, textFragPath);
+    Shader mainShaderProgram = Shader(vertPath, fragPath);               // 3d model shader
+    Shader skyboxShaderProgram = Shader(skyboxVertPath, skyboxFragPath); // skybox shader
 
     /******** PREPARE DIRECTIONAL LIGHT ********/
     DirectionalLight directionalLight = DirectionalLight(
@@ -270,6 +280,28 @@ int main(void) {
     // when using different colors or textures for each model
     glEnable(GL_DEPTH_TEST);
 
+    // Initialize OpenGL text rendering
+    init_text_rendering("Text/freemono.png", "Text/freemono.meta", screenWidth, screenHeight);
+
+    // Text attributes
+    float x = -1.0f;
+    float y = -0.9f;
+    float size_px = 40.0f;
+    int r, g, b, a;
+    r = g = b = a = 1.0f;
+
+    // Create the text itself (this returns a text ID for referencing later on)
+    int depthCtrID = add_text(
+        "depth: 0.000",     // Default text
+        x,                  // x-axis position [-1.0, 1.0]
+        y,                  // y-axis position [-1.0, 1.0f]
+        size_px,            // text size in pixels (i.e., 100.0f)
+        r,                  // red channel value of text color
+        g,                  // green channel value of text color
+        b,                  // blue channel value of text color
+        a                   // alpha channel value of text color
+    );
+
     while (!glfwWindowShouldClose(window)) {
         // Clear color and depth buffer per iteration
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -334,6 +366,12 @@ int main(void) {
         for (int i = 0; i < enemyModels.size(); i++) {
             enemyModels[i].draw(mainShaderProgram);
         }
+
+        // Update the text (that was created a while ago) with the current player submarine depth value
+        update_text(depthCtrID, ("depth: " + std::to_string(player.getModel()->getPosition().y)).c_str());
+
+        // Draw all texts (in this case, only the depth text)
+        draw_texts();
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
