@@ -134,8 +134,8 @@ int main(void) {
         return -1;
 
     // Window dimensions
-    const int screenWidth = 1000;
-    const int screenHeight = 1000;
+    const int screenWidth = 900;
+    const int screenHeight = 900;
 
     // Create a windowed mode window and its OpenGL context
     GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "No Man's Submarine", NULL, NULL);
@@ -170,15 +170,15 @@ int main(void) {
     /******** PREPARE TOP VIEW / BIRD'S EYE CAMERA (ORTHOGRAPHIC) ********/
     // Top view / bird's eye view camera
     OrthoCamera topViewCamera = OrthoCamera(
-        glm::vec3(0.0f, 90.0f, 10.0f), // camera eye
-        glm::vec3(0.0f, 0.0f, 1.0f),   // camera center
-        glm::vec3(0.0f, 1.0f, 0.0f),   // camera up
-        -50.0f,                        // left coordinate
-        50.0f,                         // right coordinate
-        -50.0f,                        // bottom coordinate
-        50.0f,                         // top coordinate
-        0.1f,                          // zNear
-        2000.0f                        // zFar
+        glm::vec3(submarinePos.x, 90.0f, submarinePos.z), // camera eye
+        glm::vec3(0.0f, 0.0f, 1.0f),                      // camera up
+        submarinePos,                                     // camera center
+        -50.0f,                                           // left coordinate
+        50.0f,                                            // right coordinate
+        -50.0f,                                           // bottom coordinate
+        50.0f,                                            // top coordinate
+        0.1f,                                             // zNear
+        10000.0f                                          // zFar
     );
     // Top / bird's eye (orthographic) view variables
     float topViewSpeed = 0.5f; // top view camera movement speed
@@ -187,18 +187,16 @@ int main(void) {
     // Model
     std::vector<std::string> playerTextures{ submarineTexturePath };
     Model playerObj(
-        submarineObjPath,                   // path to .obj
-        playerTextures,                     // list of textures
-        submarineNormalMapPath,             // path to normal map texture
-        submarinePos,                       // position
-        submarineRot,                       // rotation
-        submarineScale                      // scale
+        submarineObjPath,       // path to .obj
+        playerTextures,         // list of textures
+        submarineNormalMapPath, // path to normal map texture
+        submarinePos,           // position
+        submarineRot,           // rotation
+        submarineScale          // scale
     );
     // Point light
-    glm::vec3 lightPos = submarinePos;
-    lightPos.z += 10.0f; // point light should be 5 distance units away from the front of the player's model
     PointLight pointLight = PointLight(
-        lightPos,        // position
+        submarinePos,    // position
         glm::vec3(1.0f), // light color
         glm::vec3(1.0f), // ambient light color
         0.5f,            // ambient light strength
@@ -284,14 +282,14 @@ int main(void) {
 
     // Text attributes
     float x = -1.0f;
-    float y = -0.9f;
+    float y = 1.0f;
     float size_px = 40.0f;
     int r, g, b, a;
     r = g = b = a = 1.0f;
 
     // Create the text itself (this returns a text ID for referencing later on)
     int depthCtrID = add_text(
-        "depth: 0.000",     // Default text
+        "DEPTH: 0.000",     // default text
         x,                  // x-axis position [-1.0, 1.0]
         y,                  // y-axis position [-1.0, 1.0f]
         size_px,            // text size in pixels (i.e., 100.0f)
@@ -367,7 +365,7 @@ int main(void) {
         }
 
         // Update the text (that was created a while ago) with the current player submarine depth value
-        update_text(depthCtrID, ("depth: " + std::to_string(player.getModel()->getPosition().y)).c_str());
+        update_text(depthCtrID, ("DEPTH: " + std::to_string(player.getModel()->getPosition().y)).c_str());
 
         // Draw all texts (in this case, only the depth text)
         draw_texts();
@@ -562,7 +560,7 @@ int main(void) {
                 player.ascend();
 
                 // Print current depth of player's model
-                std::cout << "Depth: " << player.getModel()->getPosition().y << std::endl;
+                std::cout << "DEPTH: " << player.getModel()->getPosition().y << std::endl;
             }
         }
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
@@ -570,7 +568,7 @@ int main(void) {
                 // Descend player
                 player.descend();
 
-                std::cout << "Depth: " << player.getModel()->getPosition().y << std::endl;
+                std::cout << "DEPTH: " << player.getModel()->getPosition().y << std::endl;
             }
         }
         if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {

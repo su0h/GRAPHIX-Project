@@ -27,11 +27,11 @@ private:
 	// Point light which points in front of the player's model
 	PointLight* pointLight;
 	// Distance of point light from player's model
-	const float lightDist = 5.0f;
+	const float lightDist = 15.0f;
 	// Default color of point light; change as necessary
 	const glm::vec3 defaultPointLightColor = glm::vec3(1.0f);
 	// Point light intensity values (low, medium, and high)
-	const float lightIntensityVals[3]{0.5, 1.0, 3.0};
+	const float lightIntensityVals[3]{1.5, 2.5, 3.5};
 	// Point light intensity value index
 	int lightIntensityValIndex;
 
@@ -64,12 +64,12 @@ private:
 		// Get position of player's model
 		glm::vec3 modelPos = this->model->getPosition();
 
-		// Get x-axis rotation value of player's model
-		float modelRotX = this->model->getRotation().x;
+		// Get y-axis rotation value of player's model
+		float modelRotY = this->model->getRotation().y;
 
-		// Calculate new position of light based on current position and x-axis rotation of model
-		modelPos.x += -sin(glm::radians(modelRotX)) * this->rotSpeed;
-		modelPos.z += -cos(glm::radians(modelRotX)) * this->rotSpeed;
+		// Calculate new position of light based on current position and y-axis rotation of model
+		modelPos.x += sin(glm::radians(modelRotY)) * this->lightDist;
+		modelPos.z += cos(glm::radians(modelRotY)) * this->lightDist;
 
 		// Set new position of light
 		this->pointLight->setPosition(modelPos);
@@ -82,9 +82,9 @@ public:
 		PerspectiveCamera* firstPOVCamera, 
 		PerspectiveCamera* thirdPOVCamera, 
 		PointLight* pointLight,
-		bool showPlayerPOVCamera = false, // Start of the program should use player pov camera first
+		bool showPlayerPOVCamera = true,  // Start of the program should use player pov camera first
 		bool showFirstPOVCamera = false,  // Player's third POV camera is used first as well
-		int lightIntensityValIndex = 1    // Start at medium light intensity
+		int lightIntensityValIndex = 0    // Start at low light intensity
 	) {
 		// Initialize attributes
 		this->model = model;
