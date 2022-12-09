@@ -72,8 +72,8 @@ std::vector<std::vector<std::string>> enemies{
 std::vector<std::vector<glm::vec3>> enemyConfigs{
     // Angler fish
     {glm::vec3(290.0f, -1000.0f, -20.0f), // position
-     glm::vec3(0.0f, -40.0f, 0.0f),  // rotation
-     glm::vec3(20.0f)},               // scale
+     glm::vec3(0.0f, -40.0f, 0.0f),       // rotation
+     glm::vec3(20.0f)},                   // scale
 
     // Stalker
     {glm::vec3(270.0f, -300.0f, -250.0f),
@@ -162,7 +162,7 @@ int main(void) {
         glm::vec3(0.0f, 1.0f, 0.0f), // light position
         glm::vec3(1.0f),             // light color
         glm::vec3(1.0f),             // ambient light color
-        0.05f,                        // ambient light strength
+        0.05f,                       // ambient light strength
         1.0f,                        // specular strength
         16.0f                        // specular phong
     );
@@ -214,7 +214,7 @@ int main(void) {
         glm::radians(60.0f),                        // field of view
         (float)screenHeight / (float)screenWidth,   // aspect ratio
         0.1f,                                       // zNear
-        1000.0f                                      // zFar; can see farther unlike the third pov camera
+        1000.0f                                     // zFar; can see farther unlike the third pov camera
     );
     firstPOVCamera.setCenter(0.0f, 90.0f);          // initially rotate 1st POV camera 90 degrees to the right
                                                     // For it to be facing as well to where the player's model is facing
@@ -365,9 +365,6 @@ int main(void) {
         for (int i = 0; i < enemyModels.size(); i++) {
             enemyModels[i].draw(mainShaderProgram);
         }
-
-        glm::vec3 playerPos = player.getModel()->getPosition();
-        std::cout << "X: " << playerPos.x << " | Y: " << playerPos.y << " | Z: " << playerPos.z << std::endl;
 
         // Update the text (that was created a while ago) with the current player submarine depth value
         update_text(depthCtrID, ("depth: " + std::to_string(player.getModel()->getPosition().y)).c_str());
