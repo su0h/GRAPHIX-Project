@@ -37,7 +37,7 @@ std::string submarineTexturePath = "3D/Project/textures/submarine/sublow0smooth_
 std::string submarineNormalMapPath = "3D/Project/textures/submarine/sublow0smooth_defaultmaterial_normal.png";
 
 // Submarine initial configurations (position, rotation, scale)
-glm::vec3 submarinePos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 submarinePos = glm::vec3(0.0f, -100.0f, 0.0f);
 glm::vec3 submarineRot = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 submarineScale = glm::vec3(0.05f);
 
@@ -71,32 +71,32 @@ std::vector<std::vector<std::string>> enemies{
 // Vector of 3D enemy model configurations (position, rotation, and scale)
 std::vector<std::vector<glm::vec3>> enemyConfigs{
     // Angler fish
-    {glm::vec3(20.0f, -50.0f, 0.0f), // position
-     glm::vec3(0.0f, 180.0f, 0.0f),  // rotation
-     glm::vec3(1.0f)},               // scale
+    {glm::vec3(290.0f, -1000.0f, -20.0f), // position
+     glm::vec3(0.0f, -40.0f, 0.0f),  // rotation
+     glm::vec3(20.0f)},               // scale
 
     // Stalker
-    {glm::vec3(70.0f, -68.0f, -50.0f),
-     glm::vec3(0.0f, -45.0f, 0.0f),
+    {glm::vec3(270.0f, -300.0f, -250.0f),
+     glm::vec3(0.0f, 30.0f, 0.0f),
      glm::vec3(0.1f)},
 
     // Peeper
-    {glm::vec3(80.0f, -90.0f, 30.0f),
-     glm::vec3(0.0f),
-     glm::vec3(0.05f)},
+    {glm::vec3(300.0f, -10.0f, 250.0f),
+     glm::vec3(0.0f, -75.0f, 0.0f),
+     glm::vec3(0.025f)},
 
     // Reaper Leviathan
-    {glm::vec3(-55.0f, -45.0f, 45.0f),
-     glm::vec3(0.0f, 100.0f, 0.0f),
+    {glm::vec3(-105.0f, -500.0f, -155.0f),
+     glm::vec3(0.0f, 65.0f, 0.0f),
      glm::vec3(1.0f)},
 
     // Sea Emperor
-    {glm::vec3(-70.0f, -78.0f, -45.0f),
-     glm::vec3(0.0f, 30.0f, 0.0f),
-     glm::vec3(0.005f)},
+    {glm::vec3(-200.0f, -1500.0f, 215.0f),
+     glm::vec3(0.0f, -150.0f, 0.0f),
+     glm::vec3(0.1f)},
 
     // Hydra
-    {glm::vec3(0.0f, -20.0f, 55.0f),
+    {glm::vec3(0.0f, -98.0f, 25.0f),
      glm::vec3(0.0f, 180.0f, 0.0f),
      glm::vec3(1.0f)}
 };
@@ -179,7 +179,7 @@ int main(void) {
         -50.0f,                        // bottom coordinate
         50.0f,                         // top coordinate
         0.1f,                          // zNear
-        1000.0f                        // zFar
+        2000.0f                        // zFar
     );
     // Top / bird's eye (orthographic) view variables
     float topViewSpeed = 0.5f; // top view camera movement speed
@@ -215,7 +215,7 @@ int main(void) {
         glm::radians(60.0f),                        // field of view
         (float)screenHeight / (float)screenWidth,   // aspect ratio
         0.1f,                                       // zNear
-        800.0f                                      // zFar; can see farther unlike the third pov camera
+        1000.0f                                      // zFar; can see farther unlike the third pov camera
     );
     firstPOVCamera.setCenter(0.0f, 90.0f);          // initially rotate 1st POV camera 90 degrees to the right
                                                     // For it to be facing as well to where the player's model is facing
@@ -228,7 +228,7 @@ int main(void) {
         glm::radians(60.0f),                        
         (float)screenHeight / (float)screenWidth,   
         0.1f,                                       
-        400.0f        // zFar; third pov camera cannot see as far unlike the first pov camera
+        250.0f        // zFar; third pov camera cannot see as far unlike the first pov camera
     );
     // Player
     Player player = Player(
@@ -366,6 +366,9 @@ int main(void) {
         for (int i = 0; i < enemyModels.size(); i++) {
             enemyModels[i].draw(mainShaderProgram);
         }
+
+        glm::vec3 playerPos = player.getModel()->getPosition();
+        std::cout << "X: " << playerPos.x << " | Y: " << playerPos.y << " | Z: " << playerPos.z << std::endl;
 
         // Update the text (that was created a while ago) with the current player submarine depth value
         update_text(depthCtrID, ("depth: " + std::to_string(player.getModel()->getPosition().y)).c_str());
