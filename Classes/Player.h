@@ -41,7 +41,7 @@ private:
 		glm::vec3 modelPos = this->model->getPosition();
 		glm::vec3 modelRot = this->model->getRotation();
 
-		// TEMPORARY: Get current pitch and yaw values of third POV camera
+		// Get current pitch and yaw values of third POV camera
 		float pitch = this->thirdPOVCamera->getPitch();
 		float yaw = this->thirdPOVCamera->getYaw();
 
