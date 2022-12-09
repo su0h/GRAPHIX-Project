@@ -40,7 +40,7 @@ private:
     int dataLen;
 
     // Limit on the textures to be loaded
-    const int TEXT_LIMIT = 2;
+    const int TEXT_LIMIT = 1;
     // Offset value for textures and normal maps
     const int TEXT_OFFSET = 9;
     // Size of vertex components (XYZ)

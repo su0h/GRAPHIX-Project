@@ -5,9 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-/**
- * Abstract Camera class implementation. Parent class for every
- * camera-related functionality.
+/* 
+	Abstract Camera class implementation. Parent class for every camera-related functionality.
  */
 class Camera {
 protected:
@@ -117,9 +116,8 @@ public:
 	}
 };
 
-/**
- * Orthographic Camera class implementation. Holds every Orthographic Camera-related
- * functionalities. Inherits members from the abstract Camera class.
+/*
+	Orthographic Camera class implementation. Holds every Orthographic Camera-related functionalities. Inherits members from the abstract Camera class.
  */
 class OrthoCamera : public Camera {
 private:
@@ -194,9 +192,8 @@ public:
 	}
 };
 
-/**
-	Perspective Camera class implementation. Holds every Perspective Camera-related
-	functionalities. Inherits members from the abstract Camera class.
+/*
+	Perspective Camera class implementation. Holds every Perspective Camera-related functionalities. Inherits members from the abstract Camera class.
  */
 class PerspectiveCamera : public Camera {
 private:

@@ -87,8 +87,7 @@ public:
 };
 
 /*
-	Point Light class implementation. Holds every Point Light-related functionalities.
-	Inherits members from the abstract Light class.
+	Point Light class implementation. Holds every Point Light-related functionalities. Inherits members from the abstract Light class.
  */
 class PointLight : public Light {
 private:
@@ -154,8 +153,7 @@ public:
 };
 
 /*
-	Directional Light class implementation. Holds every Directional Light-related functionalities.
-	Inherits members from the abstract Light class.
+	Directional Light class implementation. Holds every Directional Light-related functionalities. Inherits members from the abstract Light class.
  */
 class DirectionalLight : public Light {
 public:

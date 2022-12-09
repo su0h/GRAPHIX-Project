@@ -14,7 +14,7 @@ private:
     // Flag for showing the skybox color or not
     bool showColor;
 
-    // Initializes the cubemap of this skybox
+    // Initializes the cubemap of this skybox.
     void initCubemap() {
         // Size of cube (for vertices)
         float size = 100.0f;
@@ -146,7 +146,7 @@ private:
         stbi_set_flip_vertically_on_load(true);
     }
 public:
-    // Instantiates a Skybox object.
+    // Instantiates a Skybox object given its faces.
 	Skybox(
         std::vector<std::string> skyboxFaces, 
         glm::vec3 color = glm::vec3(0.0f, 0.3f, 0.0f)

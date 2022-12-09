@@ -4,6 +4,8 @@
 #include <math.h>
 #include <string>       
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -23,8 +25,8 @@
 
 /******** ADDITIONAL CLASSES ********/
 #include "Classes/Shader.h"  // Shader Class
-#include "Classes/Camera.h"  // Camera Class
-#include "Classes/Light.h"   // Light Class
+#include "Classes/Camera.h"  // Camera, PerspectiveCamera, OrthoCamera Classes
+#include "Classes/Light.h"   // Light, PointLight, DirectionalLight Classes
 #include "Classes/Texture.h" // Texture Class
 #include "Classes/Model.h"   // 3D Model Class
 #include "Classes/Skybox.h"  // Skybox Class
@@ -121,10 +123,6 @@ const char* fragPath = "Shaders/main.frag";
 const char* skyboxVertPath = "Shaders/skybox.vert";
 const char* skyboxFragPath = "Shaders/skybox.frag";
 
-// Text shader paths
-const char* textVertPath = "Shaders/text.vert";
-const char* textFragPath = "Shaders/text.frag";
-
 /*
     Main (driver) function.
  */
@@ -154,7 +152,7 @@ int main(void) {
     Skybox whirlpoolSkybox = Skybox(whirlpoolSkyboxFaces);
 
     /******** PREPARE SHADERS ********/
-    Shader mainShaderProgram = Shader(vertPath, fragPath);               // 3d model shader
+    Shader mainShaderProgram = Shader(vertPath, fragPath);               // 3D model shader
     Shader skyboxShaderProgram = Shader(skyboxVertPath, skyboxFragPath); // skybox shader
 
     /******** PREPARE DIRECTIONAL LIGHT ********/
@@ -194,6 +192,7 @@ int main(void) {
         submarineRot,           // rotation
         submarineScale          // scale
     );
+
     // Point light
     PointLight pointLight = PointLight(
         submarinePos,    // position
@@ -203,6 +202,7 @@ int main(void) {
         1.0f,            // specular strength
         16.0f            // specular phong
     );
+
     // 1st POV camera
     glm::vec3 firstPOVCameraPos = submarinePos;     // same position as player's model
     PerspectiveCamera firstPOVCamera = PerspectiveCamera(
@@ -227,6 +227,7 @@ int main(void) {
         0.1f,                                       
         250.0f        // zFar; third pov camera cannot see as far unlike the first pov camera
     );
+
     // Player
     Player player = Player(
         &playerObj,       // model of player
@@ -281,7 +282,7 @@ int main(void) {
     init_text_rendering("Text/freemono.png", "Text/freemono.meta", screenWidth, screenHeight);
 
     // Text attributes
-    float x = -1.0f;
+    float x = -0.95f;
     float y = 1.0f;
     float size_px = 40.0f;
     int r, g, b, a;
@@ -289,7 +290,7 @@ int main(void) {
 
     // Create the text itself (this returns a text ID for referencing later on)
     int depthCtrID = add_text(
-        "DEPTH: 0.000",     // default text
+        "DEPTH: 0.00",      // default text
         x,                  // x-axis position [-1.0, 1.0]
         y,                  // y-axis position [-1.0, 1.0f]
         size_px,            // text size in pixels (i.e., 100.0f)
@@ -365,7 +366,11 @@ int main(void) {
         }
 
         // Update the text (that was created a while ago) with the current player submarine depth value
-        update_text(depthCtrID, ("DEPTH: " + std::to_string(player.getModel()->getPosition().y)).c_str());
+        float playerDepth = player.getModel()->getPosition().y;
+        std::stringstream stream; // To limit depth value to two decimal places
+        stream << std::fixed << std::setprecision(2) << playerDepth;
+        std::string formattedPlayerDepth = "DEPTH: " + stream.str();
+        update_text(depthCtrID, formattedPlayerDepth.c_str());
 
         // Draw all texts (in this case, only the depth text)
         draw_texts();
@@ -453,6 +458,7 @@ int main(void) {
         }
 
         /******** KEYBOARD INPUTS ********/
+        // Toggle between First Person and Third Person POV camera
         if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
             // Get current time 
             double currTime = glfwGetTime();
@@ -480,6 +486,8 @@ int main(void) {
                 prevCamSwapTime = currTime;
             }
         }
+
+        // Toggle Top View camera
         if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
             // Update position and direction of top view camera based on new position of player's model
             // Ensures that its on the top center of the player's model when switched back
@@ -492,6 +500,8 @@ int main(void) {
             // Swap between player POV camera and top view camera
             player.toggleCamera(false);
         }
+
+        // Move player submarine forward
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
             // If currently used camera view is top view
             if (!player.isPOVCameraUsed()) {
@@ -508,6 +518,8 @@ int main(void) {
                 player.moveForward();
             }
         }
+
+        // Move player submarine backward
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             if (!player.isPOVCameraUsed()) {
                 // Move top view camera down
@@ -523,6 +535,8 @@ int main(void) {
                 player.moveBackwards();
             }
         }
+
+        // Rotate player submarine counterclockwise
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             if (!player.isPOVCameraUsed()) {
                 // Move top view camera to the left
@@ -538,6 +552,8 @@ int main(void) {
                 player.turnLeft();
             }
         }
+
+        // Rotate player submarine clockwise
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             if (!player.isPOVCameraUsed()) {
                 // Move top view camera to the right
@@ -553,6 +569,8 @@ int main(void) {
                 player.turnRight();
             }
         }
+
+        // Make player submarine ascend
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
             // If player POV camera is currently used
             if (player.isPOVCameraUsed()) {
@@ -563,6 +581,8 @@ int main(void) {
                 std::cout << "DEPTH: " << player.getModel()->getPosition().y << std::endl;
             }
         }
+
+        // Make player submarine descend
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
             if (player.isPOVCameraUsed()) {
                 // Descend player
@@ -571,6 +591,8 @@ int main(void) {
                 std::cout << "DEPTH: " << player.getModel()->getPosition().y << std::endl;
             }
         }
+
+        // Toggle point light intensity
         if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
             // Get current time
             double currTime = glfwGetTime();

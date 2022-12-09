@@ -7,11 +7,10 @@
 #include <sstream>
 #include <iostream>
 
-/**
- * Shader class implementation. Holds every shader-related functionality.
- *
- * Adapted from:
- * https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_m.h
+/*
+    Shader class implementation. Holds every shader-related functionality.
+    
+    Adapted from: https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_m.h
  */
 class Shader {
 private:

@@ -44,15 +44,8 @@
     <ClInclude Include="Classes\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Classes\TextsHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="3D\model_paths.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\text.frag" />
-    <None Include="Shaders\text.vert" />
   </ItemGroup>
 </Project>

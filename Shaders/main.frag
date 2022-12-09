@@ -32,9 +32,8 @@ struct PointLight {
 	float specularPhong;
 };
 
-// Texture units for textures
+// Texture unit for model texture
 uniform sampler2D tex0;
-uniform sampler2D tex1;
 
 // Texture unit for normal mapping
 uniform sampler2D norm_tex0;
@@ -76,6 +75,7 @@ vec3 computeDirectLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 void main() {
 	// Normalize the received normals coordinates
 	vec3 normal;
+	
 	if (hasNormalMapping) {
 		normal = texture(norm_tex0, texCoord).rgb;
 		normal = normalize(normal * 2.0 - 1.0);
