@@ -104,10 +104,9 @@ void main() {
         }
         
 		FragColor = vec4(result, 1.0f) * pixelColor;       
-	// If model has no textures OR model color is toggled, apply color
+	// If model has no textures OR model color is toggled, show color only
 	} else {
-		// FragColor = vec4(result * modelColor, 1.0f);
-		FragColor = vec4(result * modelColor, 1.0f);
+		FragColor = vec4(modelColor, 1.0f);
 	}
 }
 

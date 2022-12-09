@@ -20,8 +20,8 @@ void main() {
 	// If the skybox uses textures, use the texture
     if (!showColor) {
         FragColor = texture(skybox, texCoord);
-	// If the skybox color is toggled, apply color to texture
+	// If the skybox color is toggled, show color only
     } else {
-        FragColor = texture(skybox, texCoord) * vec4(skyboxColor, 1.0);
+        FragColor = vec4(skyboxColor, 1.0);
     }
 }
