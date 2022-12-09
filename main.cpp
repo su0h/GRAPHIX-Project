@@ -154,7 +154,6 @@ int main(void) {
     Skybox whirlpoolSkybox = Skybox(whirlpoolSkyboxFaces);
 
     /******** PREPARE SHADERS ********/
-    Shader textShaderProgram = Shader(textVertPath, textFragPath);
     Shader mainShaderProgram = Shader(vertPath, fragPath);               // 3d model shader
     Shader skyboxShaderProgram = Shader(skyboxVertPath, skyboxFragPath); // skybox shader
 
